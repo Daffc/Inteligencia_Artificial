@@ -6,6 +6,7 @@ Implementar um programa em C que  recebe como entrada uma instância do jogo Flo
 
 O seu programa deve receber uma  instância do jogo a partir da entrada padrão do sistema.
 
+### Entrada:
 Uma instância é dada por um arquivo texto no seguinte formato:
 
   - a  primeira linha  do arquivo  tem 3  números inteiros  n, m  e k, separados por espaço, onde n é  o número de linhas do tabuleiro, m é  o número  de colunas  do  tabuleiro e  k  é o  número de  cores presentes no tabuleiro;
@@ -21,6 +22,7 @@ Uma instância é dada por um arquivo texto no seguinte formato:
     1 2 2 1 3 
   ````
 
+### Saida:
 A saída do seu  programa deve ser pela saída padrão  do sistema e deve conter duas linhas  de texto:
 
   - a  primeira linha  deve  conter  um número  inteiro  que indica  o tamanho da sequencia de números da segunda linha;
