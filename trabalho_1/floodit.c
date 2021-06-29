@@ -76,6 +76,7 @@ void initiateGame(TGame *game){
                 Painting
 ========================================*/  
 
+// Recursive function to paint the board.
 void paint(TGame * game, char prev_color, char next_color, int row, int col){
     
     if((row < 0) || (col < 0) || (row >= game->rows) || (col >= game->cols))
@@ -91,6 +92,16 @@ void paint(TGame * game, char prev_color, char next_color, int row, int col){
     paint(game, prev_color, next_color, row--, col);
 }
 
+// Check if the game is complete (board is all in the same color).
+char checkWin(TGame * game){
+    char color = game->board[0];
+
+    for(int i = 1; i < (game->rows * game->cols); i++)
+        if (game->board[i] != color)
+            return 0;
+    return 1;
+}
+
 /*========================================
                 MAIN
 ========================================*/  
@@ -98,23 +109,33 @@ int main(){
     TGame game;
 
     initiateGame(&game);
-    
-    printGame(&game);
 
-    paint(&game, game.board[0], 3, 0, 0);
-    printBoard(&game);
 
-    paint(&game, game.board[0], 2, 0, 0);
-    printBoard(&game);
+    // ========================================
+    //              Some tests.
+    // ========================================
 
-    paint(&game, game.board[0], 1, 0, 0);
-    printBoard(&game);
+    // printGame(&game);
 
-    paint(&game, game.board[0], 3, 0, 0);
-    printBoard(&game);
+    // paint(&game, game.board[0], 3, 0, 0);
+    // printf("%d\n", checkWin(&game));
+    // printBoard(&game);
 
-    paint(&game, game.board[0], 2, 0, 0);
-    printBoard(&game);
+    // paint(&game, game.board[0], 2, 0, 0);
+    // printf("%d\n", checkWin(&game));
+    // printBoard(&game);
+
+    // paint(&game, game.board[0], 1, 0, 0);
+    // printf("%d\n", checkWin(&game));
+    // printBoard(&game);
+
+    // paint(&game, game.board[0], 3, 0, 0);
+    // printf("%d\n", checkWin(&game));
+    // printBoard(&game);
+
+    // paint(&game, game.board[0], 2, 0, 0);
+    // printf("%d\n", checkWin(&game));
+    // printBoard(&game);
 
     return 0;
 }
