@@ -16,12 +16,13 @@ typedef struct t_Game{
 
 // Print state of board.
 void printBoard(TGame *game){
-       for(int i = 0; i < game->rows; i++){
+    for(int i = 0; i < game->rows; i++){
         for(int j = 0; j < game->cols; j++){
             printf("%d ", game->board[i * game->cols + j]);
         }
         printf("\n");
     }
+    printf("\n\n");
 }
 
 // Print state of Game.
@@ -71,7 +72,24 @@ void initiateGame(TGame *game){
     // Initialize board values.
     initializeBoard(game);
 }
+/*========================================
+                Painting
+========================================*/  
 
+void paint(TGame * game, char prev_color, char next_color, int row, int col){
+    
+    if((row < 0) || (col < 0) || (row >= game->rows) || (col >= game->cols))
+        return;
+    if((game->board[row * game->cols + col] != prev_color))
+        return;
+
+    game->board[row * game->cols + col] = next_color;
+
+    paint(game, prev_color, next_color, row, col++);
+    paint(game, prev_color, next_color, row, col--);
+    paint(game, prev_color, next_color, row++, col);
+    paint(game, prev_color, next_color, row--, col);
+}
 
 /*========================================
                 MAIN
@@ -82,6 +100,21 @@ int main(){
     initiateGame(&game);
     
     printGame(&game);
+
+    paint(&game, game.board[0], 3, 0, 0);
+    printBoard(&game);
+
+    paint(&game, game.board[0], 2, 0, 0);
+    printBoard(&game);
+
+    paint(&game, game.board[0], 1, 0, 0);
+    printBoard(&game);
+
+    paint(&game, game.board[0], 3, 0, 0);
+    printBoard(&game);
+
+    paint(&game, game.board[0], 2, 0, 0);
+    printBoard(&game);
 
     return 0;
 }
