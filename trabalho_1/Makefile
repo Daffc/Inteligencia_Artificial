@@ -1,22 +1,30 @@
 # DOUGLAS AFFONSO CLEMENTINO
 # GRR20175877
-
-EXECS  = floodit
+CC = gcc
+OBJDIR = obj
+EXEC = floodit
+MKDIR_P = mkdir -p
  
 # arquivos-objeto
-objects = floodit.o
+objects = obj/floodit.o obj/GameFunctions.o
 
-all:  $(EXECS)
+.PHONY: clean purge
 
-floodit: floodit.o 
-	gcc floodit.o  -o $@
+all: ${OBJDIR} $(EXEC)
 
-floodit.o : floodit.c
-	gcc -c floodit.c
+$(EXEC): $(objects)
+	$(CC) $(objects) -o $@
+
+$(OBJDIR)/%.o: %.c
+	$(CC) -c $< -o $@
+
+${OBJDIR}:
+	-mkdir $@
 
 clean:
-	-rm $(objects)
+	-rm -r *.o
+	-rm -r obj
 	-rm *~
 
 purge: clean
-	-rm $(EXECS)
+	-rm $(EXEC)
