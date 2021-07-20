@@ -1,0 +1,7 @@
+# Ignoring Objects and Executables
+*.o
+floodit*
+
+# Accepting all .c and .h
+!*.c
+!*.h
