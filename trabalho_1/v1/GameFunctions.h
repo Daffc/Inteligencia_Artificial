@@ -10,6 +10,8 @@
         int rows;
         int cols;
         int colors;
+        char *result;
+        int result_size;
     } TGame;
 
     // Print state of board.

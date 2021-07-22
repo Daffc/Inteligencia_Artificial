@@ -56,6 +56,11 @@ void initiateGame(TGame *game){
     game->cols = atoi(s_num); 
     s_num = strtok(NULL," ");
     game->colors = atoi(s_num); 
+    
+    // Array to store the final result of the game 
+    // (worst case it is not possible to aggregate more the one color per movie, meaning it is needed game->rows * game->cols movies to finish the game).
+    game->result = (char *) malloc(game->rows * game->cols * sizeof(char));
+    game->result_size = 0;
 
     // Alocate space for board.
     game->board = (char *) malloc( game->rows * game->cols * sizeof(char));
