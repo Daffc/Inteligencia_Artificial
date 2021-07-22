@@ -38,5 +38,8 @@
 
     // Check if the game is complete (board is all in the same color).
     char checkWin(TGame * game);
+
+    // Free Game structures.
+    void freeGame(TGame *game);
     
 #endif

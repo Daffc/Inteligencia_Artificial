@@ -97,3 +97,10 @@ char checkWin(TGame * game){
             return 0;
     return 1;
 }
+
+
+// Free Game structures.
+void freeGame(TGame *game){
+    free(game->board);
+    free(game->result);
+}
