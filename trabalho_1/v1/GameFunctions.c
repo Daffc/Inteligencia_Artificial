@@ -82,10 +82,10 @@ void paint(TGame * game, char prev_color, char next_color, int row, int col){
 
     game->board[row * game->cols + col] = next_color;
 
-    paint(game, prev_color, next_color, row, col++);
-    paint(game, prev_color, next_color, row, col--);
-    paint(game, prev_color, next_color, row++, col);
-    paint(game, prev_color, next_color, row--, col);
+    paint(game, prev_color, next_color, row, col+1);
+    paint(game, prev_color, next_color, row, col-1);
+    paint(game, prev_color, next_color, row+1, col);
+    paint(game, prev_color, next_color, row-1, col);
 }
 
 // Check if the game is complete (board is all in the same color).
