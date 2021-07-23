@@ -16,6 +16,7 @@
 	// Represents a node in te node list.
 	typedef struct AdjList{
 		char color;
+		char absorbed;
 		AdjListNode *adj_head;
 	}AdjList;
 

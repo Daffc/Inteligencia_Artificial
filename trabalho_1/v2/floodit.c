@@ -1,10 +1,11 @@
+// TODO: Remove '//DEBUG' lines.
 
 #include "GameFunctions.h"
 #include "Graph.h"
 #include "stdio.h"
 
 /*========================================
-                
+            Creating Graph
 ========================================*/  
 // Recursive function to paint flooded area while search for borders.
 void GenerateGraph(TGame * game, Graph * graph, char prev_color, int row, int col, int node_id){
@@ -77,6 +78,26 @@ void fromGameToGraph(TGame * game, Graph * graph){
 
 
 }
+/*========================================
+            Solving Problem
+========================================*/  
+/*
+TODO: 
+1. Busca em largura para procurar vértices mais distante de vértice '0' (origem de floodit).
+
+2. Após encontrar vértice mais distante 'caminhar' em sua direção.
+    - Definir todos os vértices como não absorvidos (graph->list_nodes[i].absorbed = 0)
+    - loop para resolução.
+        - Escolher 'cor' em direção a mais distante. (Busca em largura)
+        - Aglutinar todos vértices de mesma cor vizinhos do vértice '0'.
+            - Mudar cor de vétice '0'
+            - Aglomerar em '0' todos os seus vizinhos que sejam de mesma 'cor'.
+                - Adicionar 'cor' a array resposta num_passos ++.
+                - Armazenar em list vértices 'aglutinados', adicionar seus vizinhos a vizinhos de '0'.
+                - Indicar que vértice foi aglutinado e não 'existe' mais em grafo (graph->list_nodes[i].absorbed = 1)
+        - Caso somente vértice '0' sobrando no gráfo, solução.
+
+*/
 
 /*========================================
                 MAIN
@@ -92,7 +113,7 @@ int main(){
     initiateGame(&game);
     
     printBoardColors(&game);                    //DEBUG
-    printBoardNode(&game);                    //DEBUG
+    printBoardNode(&game);                      //DEBUG
 
     // Translating current game information to graph.
     fromGameToGraph(&game, &graph);
@@ -104,7 +125,7 @@ int main(){
     
     printf("=============================\n");  //DEBUG
     printBoardColors(&game);                    //DEBUG
-    printBoardNode(&game);                    //DEBUG
+    printBoardNode(&game);                      //DEBUG
     printGraph(&graph);                         //DEBUG
     printf("\n graph.V: %d\n", graph.V);        //DEBUG
 
