@@ -19,12 +19,12 @@ void printBoardColors(TGame *game){
     printf("\n\n");
 }
 
-// Print state of board in vertex perspective.
-void printBoardVertex(TGame *game){
-    printf("printBoardVertex\n");
+// Print state of board in node perspective.
+void printBoardNode(TGame *game){
+    printf("printBoardNode\n");
     for(int i = 0; i < game->rows; i++){
         for(int j = 0; j < game->cols; j++){
-            printf("%d ", game->board[i * game->cols + j].vertex);
+            printf("%d ", game->board[i * game->cols + j].node);
         }
         printf("\n");
     }
@@ -74,9 +74,9 @@ void initiateGame(TGame *game){
     // Alocate space for board.
     game->board = (struct t_Cell *) malloc( game->rows * game->cols * sizeof(TCell));
 
-    // Signing all cell in board not bellonging to any vertex.
+    // Signing all cell in board not bellonging to any node.
     for(int i=0; i < game->rows * game->cols; i++){
-        game->board[i].vertex = -1; 
+        game->board[i].node = -1; 
     }
 
     // Initialize board values.

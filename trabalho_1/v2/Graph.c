@@ -4,54 +4,57 @@
 #include <stdlib.h>
 #include "Graph.h"
 
-// A utility function to create a new adjacency list node
-struct AdjListNode* newAdjListNode(int dest)
+// Creates a new element 'AdjListNode' in order to create new edges.
+AdjListNode * newAdjListNode(int dest)
 {
-	struct AdjListNode* newNode = (struct AdjListNode*) malloc(sizeof(struct AdjListNode));
-	newNode->dest = dest;
-	newNode->next = NULL;
-	return newNode;
+	AdjListNode * new_node;
+	
+	// Creating new node with 'dest' value and returning.
+	new_node = (AdjListNode *) malloc(sizeof(AdjListNode));
+	new_node->dest = dest;
+	new_node->next = NULL;
+	return new_node;
 }
 
-// Adds an edge to an undirected graph
-void addEdge(struct Graph* graph, int src, int dest)
+// Adds an edge to the graph.
+void addEdge(Graph *graph, int src, int dest)
 {
-	// Add an edge from src to dest. A new node is
-	// added to the adjacency list of src. The node
-	// is added at the beginning
 
-	struct AdjListNode* pCrawl = graph->adv_vertex[src].head;
-	while (pCrawl)
+	AdjListNode* new_node;
+
+	// Checks if the edge between 'src' and 'dst' alread exists.
+	// If it exists, return.
+	AdjListNode* p_next = graph->list_nodes[src].adj_head;
+	while (p_next)
 	{
-		if(pCrawl->dest == dest)
+		if(p_next->dest == dest)
 			return;
-		pCrawl = pCrawl->next;
+		p_next = p_next->next;
 	}
 
-	struct AdjListNode* newNode = newAdjListNode(dest);
-	newNode->next = graph->adv_vertex[src].head;
-	graph->adv_vertex[src].head = newNode;
+	// Defining a edge from 'src' to 'dst'.
+	new_node = newAdjListNode(dest);
+	new_node->next = graph->list_nodes[src].adj_head;
+	graph->list_nodes[src].adj_head = new_node;
 
-	// Since graph is undirected, add an edge from
-	// dest to src also
-	newNode = newAdjListNode(src);
-	newNode->next = graph->adv_vertex[dest].head;
-	graph->adv_vertex[dest].head = newNode;
+	// Defining a edge from 'dst' to 'src'.
+	new_node = newAdjListNode(src);
+	new_node->next = graph->list_nodes[dest].adj_head;
+	graph->list_nodes[dest].adj_head = new_node;
 }
 
-// A utility function to print the adjacency list
-// representation of graph
-void printGraph(struct Graph* graph)
+// Print Graph by a node perspective.
+void printGraph(Graph *graph)
 {
 	int v;
 	for (v = 0; v < graph->V; ++v)
 	{
-		struct AdjListNode* pCrawl = graph->adv_vertex[v].head;
-		printf("\n vertex %d with color %d \n head ", v, graph->adv_vertex[v].color);
-		while (pCrawl)
+		AdjListNode *p_next = graph->list_nodes[v].adj_head;
+		printf("\n vertex %d with color %d \n adj_head ", v, graph->list_nodes[v].color);
+		while (p_next)
 		{
-			printf("-> %d", pCrawl->dest);
-			pCrawl = pCrawl->next;
+			printf("-> %d", p_next->dest);
+			p_next = p_next->next;
 		}
 		printf("\n");
 	}

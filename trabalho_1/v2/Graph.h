@@ -6,38 +6,33 @@
 #ifndef GRAPH
 #define GRAPH
 
-	// A structure to represent an adjacency list node
-	struct AdjListNode
-	{
+	// Element of the list of adjacente nodes.
+	typedef struct AdjListNode AdjListNode;
+	struct AdjListNode{
 		int dest;
-		struct AdjListNode* next;
+		AdjListNode *next;
 	};
 
-	// A structure to represent an adjacency list
-	struct AdjList
-	{
+	// Represents a node in te node list.
+	typedef struct AdjList{
 		char color;
-		struct AdjListNode *head;
-	};
+		AdjListNode *adj_head;
+	}AdjList;
 
-	// A structure to represent a graph. A graph
-	// is an adv_vertex of adjacency lists.
-	// Size of adv_vertex will be V (number of vertices
-	// in graph)
-	struct Graph
-	{
+	// Represents the graph, composed by V nodes, edges could be gathered 
+	// by the linked list inside each node in 'list_nodes'.
+	typedef struct Graph{
 		int V;
-		struct AdjList* adv_vertex;
-	};
+		AdjList *list_nodes;
+	}Graph;
 
-	// A utility function to create a new adjacency list node
-	struct AdjListNode* newAdjListNode(int dest);
+	// Creates a new element 'AdjListNode' in order to create new edges.
+	AdjListNode* newAdjListNode(int dest);
 
-	// Adds an edge to an undirected graph
-	void addEdge(struct Graph* graph, int src, int dest);
+	// Adds an edge to the graph.
+	void addEdge(Graph *graph, int src, int dest);
 
-	// A utility function to print the adjacency list
-	// representation of graph
-	void printGraph(struct Graph* graph);
+	// Print Graph by a node perspective.
+	void printGraph(Graph *graph);
 
 #endif

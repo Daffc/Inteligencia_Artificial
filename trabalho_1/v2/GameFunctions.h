@@ -8,7 +8,7 @@
 
     typedef struct t_Cell{
         char color;
-        int vertex;
+        int node;
     }TCell;
 
     typedef struct t_Game{
@@ -21,8 +21,8 @@
     // Print state of board in colors perspective.
     void printBoardColors(TGame *game);
 
-    // Print state of board in vertex perspective.
-    void printBoardVertex(TGame *game);
+    // Print state of board in node perspective.
+    void printBoardNode(TGame *game);
 
     // Print state of Game.
     void printGame(TGame *game);
