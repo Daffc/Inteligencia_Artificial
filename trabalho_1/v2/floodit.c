@@ -81,6 +81,69 @@ void fromGameToGraph(TGame * game, Graph * graph){
 /*========================================
             Solving Problem
 ========================================*/  
+
+void searchFarthestNode(Graph *graph){
+    int node, len;
+    Queue *queue;
+    int *distances;
+    char *visited;
+    AdjListNode* p_next;
+
+    queue = initializeQueue(graph->V);
+    
+    distances = (int *) malloc(graph->V * (sizeof(int)));
+    
+    visited = (char *) malloc(graph->V * (sizeof(char)));
+
+
+    memset(distances, 0, graph->V * (sizeof(int)));    
+    memset(visited, 0, graph->V * (sizeof(int)));
+
+    queuePush(queue, 0);
+    
+    *visited = 1;
+    
+    while(!checkEmptyQueue(queue)){
+        
+        node = queueGetNext(queue);
+            
+        printf("Node: %d\n", node);        
+
+        p_next = graph->list_nodes[node].adj_head;
+        while (p_next){
+            if((!visited[p_next->dest]) && (!graph->list_nodes[p_next->dest].absorbed)){
+                queuePush(queue, p_next->dest);
+
+                distances[p_next->dest] = distances[node] + 1;
+
+                visited[p_next->dest] = 1;
+            }
+            p_next = p_next->next;
+        }
+
+    }
+
+    // printGraph(graph);
+    
+    printf("Distances:");
+    for(int i = 0; i< graph->V; i++)
+        printf(" %d", distances[i]);
+    printf(" \n");
+
+
+    printf("Queue:");
+    queue->actual = queue->head;
+    while(!checkEmptyQueue(queue)){
+        printf(" %d", queueGetNext(queue));
+    }
+    printf(" \n");
+
+    printf("Visited:");
+    for(int i = 0; i< graph->V; i++)
+        printf(" %d", visited[i]);
+    printf(" \n");
+} 
+
 /*
 TODO: 
 1. Busca em largura para procurar vértices mais distante de vértice '0' (origem de floodit).
@@ -124,10 +187,12 @@ int main(){
 
     
     printf("=============================\n");  //DEBUG
-    printBoardColors(&game);                    //DEBUG
-    printBoardNode(&game);                      //DEBUG
-    printGraph(&graph);                         //DEBUG
-    printf("\n graph.V: %d\n", graph.V);        //DEBUG
+    // printBoardColors(&game);                    //DEBUG
+    // printBoardNode(&game);                      //DEBUG
+    // printGraph(&graph);                         //DEBUG
+    // printf("\n graph.V: %d\n", graph.V);        //DEBUG
+    
+    searchFarthestNode(&graph);
 
     return 0;
 }
