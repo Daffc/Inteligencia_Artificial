@@ -14,17 +14,17 @@
 	};
 
 	// Represents a node in te node list.
-	typedef struct AdjList{
+	typedef struct GNode{
 		char color;
 		char absorbed;
 		AdjListNode *adj_head;
-	}AdjList;
+	}GNode;
 
 	// Represents the graph, composed by V nodes, edges could be gathered 
 	// by the linked list inside each node in 'list_nodes'.
 	typedef struct Graph{
 		int V;
-		AdjList *list_nodes;
+		GNode *list_nodes;
 	}Graph;
 
 

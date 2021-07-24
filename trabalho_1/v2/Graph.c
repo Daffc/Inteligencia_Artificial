@@ -1,5 +1,3 @@
-// A C Program to demonstrate adjacency list
-// representation of graphs
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,8 +9,7 @@
 ========================================*/  
 
 // Creates a new element 'AdjListNode' in order to create new edges.
-AdjListNode * newAdjListNode(int dest)
-{
+AdjListNode * newAdjListNode(int dest){
 	AdjListNode * new_node;
 	
 	// Creating new node with 'dest' value and returning.
@@ -23,8 +20,7 @@ AdjListNode * newAdjListNode(int dest)
 }
 
 // Adds an edge to the graph.
-void addEdge(Graph *graph, int src, int dest)
-{
+void addEdge(Graph *graph, int src, int dst){
 
 	AdjListNode* new_node;
 	AdjListNode* p_next;
@@ -32,20 +28,20 @@ void addEdge(Graph *graph, int src, int dest)
 	// If it exists, return.
 	p_next = graph->list_nodes[src].adj_head;
 	while (p_next){
-		if(p_next->dest == dest)
+		if(p_next->dest == dst)
 			return;
 		p_next = p_next->next;
 	}
 
 	// Defining a edge from 'src' to 'dst'.
-	new_node = newAdjListNode(dest);
+	new_node = newAdjListNode(dst);
 	new_node->next = graph->list_nodes[src].adj_head;
 	graph->list_nodes[src].adj_head = new_node;
 
 	// Defining a edge from 'dst' to 'src'.
 	new_node = newAdjListNode(src);
-	new_node->next = graph->list_nodes[dest].adj_head;
-	graph->list_nodes[dest].adj_head = new_node;
+	new_node->next = graph->list_nodes[dst].adj_head;
+	graph->list_nodes[dst].adj_head = new_node;
 }
 
 // Deallocate graph memory.
@@ -53,6 +49,7 @@ void freeGraph(Graph *graph){
 	AdjListNode *p_next, *aux_pointer;
 	int count;
 
+	// Deallocating all adjacence nodes (edges) for all nodes.
 	for(int i= 0; i < graph->V; i++){
 		count = 0;
 		p_next = graph->list_nodes[i].adj_head;
@@ -62,25 +59,10 @@ void freeGraph(Graph *graph){
 			free(aux_pointer);
 			count ++;
 		}
-
 	}
 
+	// Deallocating the nodes themselves.
 	free(graph->list_nodes);
-}
-
-// Print Graph by a node perspective.
-void printGraph(Graph *graph)
-{
-	int v;
-	for(int i= 0; i < graph->V; i++){
-		AdjListNode *p_next = graph->list_nodes[i].adj_head;
-		printf("\n vertex %d\n\tcolor: %d\n\tabsorbed: %d\n\tadj_head ", i, graph->list_nodes[i].color, graph->list_nodes[i].absorbed);
-		while (p_next){
-			printf("-> %d", p_next->dest);
-			p_next = p_next->next;
-		}
-		printf("\n");
-	}
 }
 
 // Executes a BFS search in 'graph' returning the resulting spanning tree in 'BFST'.
@@ -109,10 +91,10 @@ void BFS(Graph *graph, BFSTreeNode *BFST){
 
         //Check all nodes conected to 'node'
         p_next = graph->list_nodes[node].adj_head;
-        while (p_next){
+        while(p_next){
             // If node hasn't be visited nor been absorbed.
             if((!visited[p_next->dest]) && (!graph->list_nodes[p_next->dest].absorbed)){
-                //Add note to queue.
+                //Add node to queue.
                 queuePush(queue, p_next->dest);
 
                 // Define 'parent' and 'level' of the new explored node in BFST.
@@ -170,4 +152,22 @@ int checkEmptyQueue(Queue *queue){
 void freeQueue(Queue *queue){
 	free(queue->head);
 	free(queue);
+}
+
+
+/*========================================
+            DEBUG FUNCTIONS
+========================================*/  
+// Print Graph by a node perspective.
+void printGraph(Graph *graph)
+{
+	for(int i= 0; i < graph->V; i++){
+		AdjListNode *p_next = graph->list_nodes[i].adj_head;
+		printf("\n node: %d\n\tcolor: %d\n\tabsorbed: %d\n\tadj_head ", i, graph->list_nodes[i].color, graph->list_nodes[i].absorbed);
+		while (p_next){
+			printf("-> %d", p_next->dest);
+			p_next = p_next->next;
+		}
+		printf("\n");
+	}
 }

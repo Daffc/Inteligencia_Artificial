@@ -4,62 +4,8 @@
 #include "stdio.h"
 
 /*========================================
-            DEBUG PRINTS
-========================================*/
-
-// Print state of board in colors perspective.
-void printBoardColors(TGame *game){
-    printf("printBoardColors\n");
-    for(int i = 0; i < game->rows; i++){
-        for(int j = 0; j < game->cols; j++){
-            printf("%d ", game->board[i * game->cols + j].color);
-        }
-        printf("\n");
-    }
-    printf("\n\n");
-}
-
-// Print state of board in node perspective.
-void printBoardNode(TGame *game){
-    printf("printBoardNode\n");
-    for(int i = 0; i < game->rows; i++){
-        for(int j = 0; j < game->cols; j++){
-            printf("%d ", game->board[i * game->cols + j].node);
-        }
-        printf("\n");
-    }
-    printf("\n\n");
-}
-
-// Print state of Game.
-void printGame(TGame *game){
-
-    printf("row: %d\ncols: %d\ncolors: %d\n\n", game->rows, game->cols, game->colors);
-    printBoardColors(game);
-}
-
-/*========================================
             GAME FUNCTIONS
 ========================================*/  
-
-// Print state of board.
-void initializeBoard(TGame *game){
-    char *line, *s_num;
-    long unsigned int limit = 100;
-
-    line = (char *) malloc(100);
-
-    for(int i = 0; i < game->rows; i++){
-        getline(&line, &limit, stdin);
-        s_num = strtok(line," ");
-        for(int j = 0; j < game->cols; j++){
-            game->board[i * game->cols + j].color = atoi(s_num);
-            s_num = strtok(NULL," ");
-        }
-    }
-    free(line);
-}
-
 // Initiating Game dimensions and board.
 void initiateGame(TGame *game){
     char *line, *s_num;
@@ -92,4 +38,60 @@ void initiateGame(TGame *game){
 // Free Game structures.
 void freeGame(TGame *game){
     free(game->board);
+}
+
+
+// Reading values from the stdin and definnf board.
+void initializeBoard(TGame *game){
+    char *line, *s_num;
+    long unsigned int limit = 100;
+
+    line = (char *) malloc(100);
+
+    // For each row in the board, get correspondent 
+    // line in stdin and populate the board.
+    for(int i = 0; i < game->rows; i++){
+        getline(&line, &limit, stdin);
+        s_num = strtok(line," ");
+        for(int j = 0; j < game->cols; j++){
+            game->board[i * game->cols + j].color = atoi(s_num);
+            s_num = strtok(NULL," ");
+        }
+    }
+    free(line);
+}
+
+/*========================================
+            DEBUG FUNCTIONS
+========================================*/ 
+
+// Print state of board in colors perspective.
+void printBoardColors(TGame *game){
+    printf("printBoardColors\n");
+    for(int i = 0; i < game->rows; i++){
+        for(int j = 0; j < game->cols; j++){
+            printf("%d ", game->board[i * game->cols + j].color);
+        }
+        printf("\n");
+    }
+    printf("\n\n");
+}
+
+// Print state of board in node perspective.
+void printBoardNode(TGame *game){
+    printf("printBoardNode\n");
+    for(int i = 0; i < game->rows; i++){
+        for(int j = 0; j < game->cols; j++){
+            printf("%d ", game->board[i * game->cols + j].node);
+        }
+        printf("\n");
+    }
+    printf("\n\n");
+}
+
+// Print state of Game.
+void printGame(TGame *game){
+
+    printf("row: %d\ncols: %d\ncolors: %d\n\n", game->rows, game->cols, game->colors);
+    printBoardColors(game);
 }
