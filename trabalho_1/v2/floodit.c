@@ -69,9 +69,14 @@ void fromGameToGraph(TGame * game, Graph * graph){
         }
     }
 
+    
+    // Defining all nodes as not absorbed.
+    for (int i = 0; i < graph->V; i++)
+        graph->list_nodes[i].absorbed = 0;
+
     // Reducing memory allocation dimension to the really used.
-    tmp = realloc(graph->list_nodes, graph->V * sizeof(AdjList));
-    if(tmp == NULL){
+    graph->list_nodes = realloc(graph->list_nodes, graph->V * sizeof(AdjList));
+    if(graph->list_nodes == NULL){
         puts("Error during memory reallocation. Exiting.");
         exit(1);
     }
@@ -81,8 +86,11 @@ void fromGameToGraph(TGame * game, Graph * graph){
 ========================================*/  
 
 
+// Search for the farthest node to from origin node '0' 
+// and returns a neighbor of '0' that leads to that node. 
 int defineNextNode(Graph *graph){    
     BFSTreeNode *BFST;
+    int fartest_node, c_node, p_node;
 
     // Initilize structure to represent BFS Tree and list of visited nodes.
     BFST = (BFSTreeNode *) malloc(graph->V * (sizeof(BFSTreeNode)));
@@ -90,27 +98,75 @@ int defineNextNode(Graph *graph){
     // Initializing control structures.
     memset(BFST, 0, graph->V * (sizeof(BFSTreeNode)));    
 
+    // Doing BFS and recovering spanning tree in BFST.
     BFS(graph, BFST);
 
-    printf("BFST:\n");                                                  //DEBUG
-    for(int i = 0; i< graph->V; i++)                                    //DEBUG
-        printf("\t%d (%d , %d)\n", i, BFST[i].parent, BFST[i].level);   //DEBUG
-    printf(" \n");                                                      //DEBUG
+    // printf("BFST:\n");                                                  //DEBUG
+    // for(int i = 0; i< graph->V; i++)                                    //DEBUG
+    //     printf("\t%d (%d , %d)\n", i, BFST[i].parent, BFST[i].level);   //DEBUG
+    // printf(" \n");                                                      //DEBUG
 
-    // printf("Queue:");                       //DEBUG
-    // queue->actual = queue->head;            //DEBUG
-    // while(!checkEmptyQueue(queue))          //DEBUG
-    //     printf(" %d", queueGetNext(queue)); //DEBUG
-    // printf(" \n");                          //DEBUG
 
-    // printf("Visited:");                 //DEBUG
-    // for(int i = 0; i< graph->V; i++)    //DEBUG
-    //     printf(" %d", visited[i]);      //DEBUG
-    // printf(" \n");                      //DEBUG
+    // Find the farthest node in BFST.
+    fartest_node = 0;
+    for(int i = 0; i< graph->V; i++){
+        if(BFST[i].level > BFST[fartest_node].level)
+            fartest_node = i;
+    }                                    
+    
+    // printf("fartest_node: %d\n", fartest_node); //DEBUG
 
-    return 0;
 
-} 
+    // Search for the branch of node '0' that leads to the 'fartest_node' 
+    // switch between current node (c_node) and parent node (p_node).
+    c_node = fartest_node;
+    while(p_node = BFST[c_node].parent)
+        c_node = p_node;
+
+    // printf("c_node: %d\n", c_node); //DEBUG
+
+
+    free(BFST);    
+    // Returns the chield of '0' that leads to the 'fartest_node'.
+    return c_node;
+}
+
+// Making node '0' absorbs its neighbors that shares the 
+// same color as 'node', changing '0' color as well.
+void absorbNodes(Graph *graph, int node){
+
+    AdjListNode *p_next, *p_edges;
+    char new_color;
+    int neigh_id;
+
+    new_color = graph->list_nodes[node].color;
+
+    graph->list_nodes[0].color = new_color;
+
+    //Check all nodes conected to '0'.
+    p_next = graph->list_nodes[0].adj_head;
+    while (p_next){
+        neigh_id = p_next->dest;
+
+        // If node shares the same color as '0' and hasn't been absorbed.
+        if((graph->list_nodes[neigh_id].color == new_color) && (!graph->list_nodes[neigh_id].absorbed)){
+            printf("Entrou: %d \n", neigh_id);
+            
+            //  Transfer all neighbors from 'neigh_id' to '0' (edges).
+            p_edges = graph->list_nodes[neigh_id].adj_head;
+            while (p_edges){
+                if(p_edges->dest){
+                    printf("\tAdding: %d\n", p_edges->dest);                    
+                    addEdge(graph, 0, p_edges->dest);
+                }
+                p_edges = p_edges->next;
+            }
+            // Mark node as absorbed;
+            graph->list_nodes[neigh_id].absorbed = 1;
+        }
+        p_next = p_next->next;
+    }
+}
 
 /*
 TODO: 
@@ -142,16 +198,19 @@ int main(){
 
     // Initiating values of game structure.
     initiateGame(&game);
+
     
-    printBoardColors(&game);                    //DEBUG
-    printBoardNode(&game);                      //DEBUG
+    // printBoardColors(&game);                    //DEBUG
+    // printBoardNode(&game);                      //DEBUG
+
+    
 
     // Translating current game information to graph.
     fromGameToGraph(&game, &graph);
 
     // freeing game structures.
     freeGame(&game);
-
+    
 
     
     printf("=============================\n");  //DEBUG
@@ -160,7 +219,16 @@ int main(){
     // printGraph(&graph);                         //DEBUG
     // printf("\n graph.V: %d\n", graph.V);        //DEBUG
     
-    defineNextNode(&graph);
+    int node;
 
+    node = defineNextNode(&graph);
+    absorbNodes(&graph, node);
+
+
+    
+
+    printGraph(&graph);  
+
+    freeGraph(&graph);
     return 0;
 }

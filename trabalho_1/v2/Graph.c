@@ -27,10 +27,10 @@ void addEdge(Graph *graph, int src, int dest)
 {
 
 	AdjListNode* new_node;
-
+	AdjListNode* p_next;
 	// Checks if the edge between 'src' and 'dst' alread exists.
 	// If it exists, return.
-	AdjListNode* p_next = graph->list_nodes[src].adj_head;
+	p_next = graph->list_nodes[src].adj_head;
 	while (p_next){
 		if(p_next->dest == dest)
 			return;
@@ -48,16 +48,34 @@ void addEdge(Graph *graph, int src, int dest)
 	graph->list_nodes[dest].adj_head = new_node;
 }
 
+// Deallocate graph memory.
+void freeGraph(Graph *graph){
+	AdjListNode *p_next, *aux_pointer;
+	int count;
+
+	for(int i= 0; i < graph->V; i++){
+		count = 0;
+		p_next = graph->list_nodes[i].adj_head;
+		while(p_next){
+			aux_pointer = p_next;
+			p_next = p_next->next;
+			free(aux_pointer);
+			count ++;
+		}
+
+	}
+
+	free(graph->list_nodes);
+}
+
 // Print Graph by a node perspective.
 void printGraph(Graph *graph)
 {
 	int v;
-	for (v = 0; v < graph->V; ++v)
-	{
-		AdjListNode *p_next = graph->list_nodes[v].adj_head;
-		printf("\n vertex %d with color %d \n adj_head ", v, graph->list_nodes[v].color);
-		while (p_next)
-		{
+	for(int i= 0; i < graph->V; i++){
+		AdjListNode *p_next = graph->list_nodes[i].adj_head;
+		printf("\n vertex %d\n\tcolor: %d\n\tabsorbed: %d\n\tadj_head ", i, graph->list_nodes[i].color, graph->list_nodes[i].absorbed);
+		while (p_next){
 			printf("-> %d", p_next->dest);
 			p_next = p_next->next;
 		}
@@ -77,7 +95,7 @@ void BFS(Graph *graph, BFSTreeNode *BFST){
 
     // Initializing control structure.
     visited = (char *) malloc(graph->V * (sizeof(char)));
-    memset(visited, 0, graph->V * (sizeof(int)));
+    memset(visited, 0, graph->V * (sizeof(char)));
 
     // Add '0' to the queue and mark it as visited
     queuePush(queue, 0);
@@ -92,7 +110,7 @@ void BFS(Graph *graph, BFSTreeNode *BFST){
         //Check all nodes conected to 'node'
         p_next = graph->list_nodes[node].adj_head;
         while (p_next){
-            // If node hasent be visited nor been absorbed.
+            // If node hasn't be visited nor been absorbed.
             if((!visited[p_next->dest]) && (!graph->list_nodes[p_next->dest].absorbed)){
                 //Add note to queue.
                 queuePush(queue, p_next->dest);
@@ -151,4 +169,5 @@ int checkEmptyQueue(Queue *queue){
 // Deallocate queue memory.
 void freeQueue(Queue *queue){
 	free(queue->head);
+	free(queue);
 }

@@ -47,6 +47,9 @@
 	// Adds an edge to the graph.
 	void addEdge(Graph *graph, int src, int dest);
 
+	// Deallocate graph memory.
+	void freeGraph(Graph *graph);
+
 	// Print Graph by a node perspective.
 	void printGraph(Graph *graph);
 
