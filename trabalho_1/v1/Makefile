@@ -22,9 +22,9 @@ ${OBJDIR}:
 	-mkdir $@
 
 clean:
-	-rm -r *.o
-	-rm -r obj
-	-rm *~
+	-rm -f *.o 
+	-rm -rf obj
+	-rm -f *~
 
 purge: clean
-	-rm $(EXEC)
+	-rm -f $(EXEC)
