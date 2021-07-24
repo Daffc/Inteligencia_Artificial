@@ -44,8 +44,10 @@ void printGame(TGame *game){
 
 // Print state of board.
 void initializeBoard(TGame *game){
-    char *line = NULL, *s_num;
+    char *line, *s_num;
     long unsigned int limit = 100;
+
+    line = (char *) malloc(100);
 
     for(int i = 0; i < game->rows; i++){
         getline(&line, &limit, stdin);
@@ -55,12 +57,15 @@ void initializeBoard(TGame *game){
             s_num = strtok(NULL," ");
         }
     }
+    free(line);
 }
 
 // Initiating Game dimensions and board.
 void initiateGame(TGame *game){
-    char *line = NULL, *s_num;
+    char *line, *s_num;
     long unsigned int limit = 100;
+
+    line = (char *) malloc(100);
 
     // Get first line and store dimensions and colors.
     getline(&line, &limit, stdin);
@@ -81,6 +86,7 @@ void initiateGame(TGame *game){
 
     // Initialize board values.
     initializeBoard(game);
+    free(line);
 }
 
 // Free Game structures.
