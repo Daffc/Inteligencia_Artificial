@@ -2,7 +2,7 @@
 
 #include "GameFunctions.h"
 #include "Graph.h"
-#include "stdio.h"
+#include <stdio.h>
 
 /*========================================
             Creating Graph
@@ -75,73 +75,41 @@ void fromGameToGraph(TGame * game, Graph * graph){
         puts("Error during memory reallocation. Exiting.");
         exit(1);
     }
-
-
 }
 /*========================================
             Solving Problem
 ========================================*/  
 
-void searchFarthestNode(Graph *graph){
-    int node, len;
-    Queue *queue;
-    int *distances;
-    char *visited;
-    AdjListNode* p_next;
 
-    queue = initializeQueue(graph->V);
-    
-    distances = (int *) malloc(graph->V * (sizeof(int)));
-    
-    visited = (char *) malloc(graph->V * (sizeof(char)));
+int defineNextNode(Graph *graph){    
+    BFSTreeNode *BFST;
 
+    // Initilize structure to represent BFS Tree and list of visited nodes.
+    BFST = (BFSTreeNode *) malloc(graph->V * (sizeof(BFSTreeNode)));
 
-    memset(distances, 0, graph->V * (sizeof(int)));    
-    memset(visited, 0, graph->V * (sizeof(int)));
+    // Initializing control structures.
+    memset(BFST, 0, graph->V * (sizeof(BFSTreeNode)));    
 
-    queuePush(queue, 0);
-    
-    *visited = 1;
-    
-    while(!checkEmptyQueue(queue)){
-        
-        node = queueGetNext(queue);
-            
-        printf("Node: %d\n", node);        
+    BFS(graph, BFST);
 
-        p_next = graph->list_nodes[node].adj_head;
-        while (p_next){
-            if((!visited[p_next->dest]) && (!graph->list_nodes[p_next->dest].absorbed)){
-                queuePush(queue, p_next->dest);
+    printf("BFST:\n");                                                  //DEBUG
+    for(int i = 0; i< graph->V; i++)                                    //DEBUG
+        printf("\t%d (%d , %d)\n", i, BFST[i].parent, BFST[i].level);   //DEBUG
+    printf(" \n");                                                      //DEBUG
 
-                distances[p_next->dest] = distances[node] + 1;
+    // printf("Queue:");                       //DEBUG
+    // queue->actual = queue->head;            //DEBUG
+    // while(!checkEmptyQueue(queue))          //DEBUG
+    //     printf(" %d", queueGetNext(queue)); //DEBUG
+    // printf(" \n");                          //DEBUG
 
-                visited[p_next->dest] = 1;
-            }
-            p_next = p_next->next;
-        }
+    // printf("Visited:");                 //DEBUG
+    // for(int i = 0; i< graph->V; i++)    //DEBUG
+    //     printf(" %d", visited[i]);      //DEBUG
+    // printf(" \n");                      //DEBUG
 
-    }
+    return 0;
 
-    // printGraph(graph);
-    
-    printf("Distances:");
-    for(int i = 0; i< graph->V; i++)
-        printf(" %d", distances[i]);
-    printf(" \n");
-
-
-    printf("Queue:");
-    queue->actual = queue->head;
-    while(!checkEmptyQueue(queue)){
-        printf(" %d", queueGetNext(queue));
-    }
-    printf(" \n");
-
-    printf("Visited:");
-    for(int i = 0; i< graph->V; i++)
-        printf(" %d", visited[i]);
-    printf(" \n");
 } 
 
 /*
@@ -192,7 +160,7 @@ int main(){
     // printGraph(&graph);                         //DEBUG
     // printf("\n graph.V: %d\n", graph.V);        //DEBUG
     
-    searchFarthestNode(&graph);
+    defineNextNode(&graph);
 
     return 0;
 }

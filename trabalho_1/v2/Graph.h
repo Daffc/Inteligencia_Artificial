@@ -35,6 +35,12 @@
 		int *end;
 	}Queue;
 
+	// Struct to manage BFS tree nodes.
+	typedef struct BFSTreeNode{
+		int parent;
+		int level;
+	}BFSTreeNode;
+
 	// Creates a new element 'AdjListNode' in order to create new edges.
 	AdjListNode* newAdjListNode(int dest);
 
@@ -43,6 +49,9 @@
 
 	// Print Graph by a node perspective.
 	void printGraph(Graph *graph);
+
+	// Executes a BFS search in 'graph' returning the resulting spanning tree in 'BFST'.
+	void BFS(Graph *graph, BFSTreeNode *BFST);
 
 	/*========================================
 				Queue Manipulation

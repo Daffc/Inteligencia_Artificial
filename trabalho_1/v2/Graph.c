@@ -2,6 +2,7 @@
 // representation of graphs
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "Graph.h"
 
 
@@ -62,6 +63,53 @@ void printGraph(Graph *graph)
 		}
 		printf("\n");
 	}
+}
+
+// Executes a BFS search in 'graph' returning the resulting spanning tree in 'BFST'.
+void BFS(Graph *graph, BFSTreeNode *BFST){
+    int node;
+    Queue *queue;
+    char *visited;
+    AdjListNode *p_next;
+    
+    // Initialize queue.
+    queue = initializeQueue(graph->V);
+
+    // Initializing control structure.
+    visited = (char *) malloc(graph->V * (sizeof(char)));
+    memset(visited, 0, graph->V * (sizeof(int)));
+
+    // Add '0' to the queue and mark it as visited
+    queuePush(queue, 0);
+    *visited = 1;
+
+    //Executing BSF in order to define a minimum spanning tree (BFST).
+    // While queue is not empty.
+    while(!checkEmptyQueue(queue)){
+        // Get Next element of queue
+        node = queueGetNext(queue);
+
+        //Check all nodes conected to 'node'
+        p_next = graph->list_nodes[node].adj_head;
+        while (p_next){
+            // If node hasent be visited nor been absorbed.
+            if((!visited[p_next->dest]) && (!graph->list_nodes[p_next->dest].absorbed)){
+                //Add note to queue.
+                queuePush(queue, p_next->dest);
+
+                // Define 'parent' and 'level' of the new explored node in BFST.
+                BFST[p_next->dest].level = BFST[node].level + 1;
+                BFST[p_next->dest].parent = node;
+
+                // Mark node as visited.
+                visited[p_next->dest] = 1;
+            }
+            p_next = p_next->next;
+        }
+    }
+
+	free(visited);
+	freeQueue(queue);
 }
 
 
