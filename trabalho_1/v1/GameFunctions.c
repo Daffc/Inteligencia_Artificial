@@ -28,11 +28,15 @@ void printGame(TGame *game){
             GAME FUNCTIONS
 ========================================*/  
 
-// Print state of board.
+// Reading values from the stdin and definnf board.
 void initializeBoard(TGame *game){
-    char *line = NULL, *s_num;
+    char *line, *s_num;
     long unsigned int limit = 100;
 
+    line = (char *) malloc(100);
+
+    // For each row in the board, get correspondent 
+    // line in stdin and populate the board.
     for(int i = 0; i < game->rows; i++){
         getline(&line, &limit, stdin);
         s_num = strtok(line," ");
@@ -41,12 +45,15 @@ void initializeBoard(TGame *game){
             s_num = strtok(NULL," ");
         }
     }
+    free(line);
 }
 
 // Initiating Game dimensions and board.
 void initiateGame(TGame *game){
     char *line = NULL, *s_num;
     long unsigned int limit = 100;
+    
+    line = (char *) malloc(100);
 
     // Get first line and store dimensions and colors.
     getline(&line, &limit, stdin);
@@ -67,6 +74,7 @@ void initiateGame(TGame *game){
 
     // Initialize board values.
     initializeBoard(game);
+    free(line);
 }
 /*========================================
                 Painting
