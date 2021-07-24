@@ -3,6 +3,7 @@
 CC = gcc
 OBJDIR = obj
 EXEC = floodit
+FLAGS = -g
 MKDIR_P = mkdir -p
  
 # arquivos-objeto
@@ -13,10 +14,10 @@ objects = obj/floodit.o obj/GameFunctions.o obj/Graph.o
 all: ${OBJDIR} $(EXEC)
 
 $(EXEC): $(objects)
-	$(CC) $(objects) -o $@
+	$(CC) $(objects) -o $@ $(FLAGS)
 
 $(OBJDIR)/%.o: %.c
-	$(CC) -c $< -o $@
+	$(CC) -c $< -o $@ $(FLAGS)
 
 ${OBJDIR}:
 	-mkdir $@
