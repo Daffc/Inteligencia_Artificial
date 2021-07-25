@@ -1,0 +1,78 @@
+NOME:   Douglas Affonso Clementino
+        GRR20175877
+
+Duas abordagens foram utilizadas para resolver o problema do floodlit,
+com não ficou claro qual seria a principal métrica (tempo de execução ou "qualidade" da resposta) ambas foram enviadas.
+
+
+A primeira abordagem v1 é mais simplista, executando em menor tempo mas resposta viável com mais passos.
+
+A segunda abordagem v2 é um pouco mais elaborada, utilizando de um grafo, executando em tempo maior mas com
+resposta viável mais otimizada (menos passos).
+
+Ambas têm abordagens gulosas, enquanto a primeira busca maximizar a área pintada a cada paço, a segunda busca
+minimizar a altura de uma Árvore de Busca em Largura extraída de grafo representa o problema.
+
+==================================================================================================
+    v1  |
+=========
+Nesta versão, o problema é abordado de forma direta,  buscando maximizar a quantidade de área agregada a área de 
+flood a cada iteração (exploração local).
+
+- Primeiramente são extraídas as informações da entrada para estrutura variável de TGame.
+- Estrutura TGame preenchida é passada para função 'greedAreas', que contém o loop principal como segue:
+
+    Enquanto jogo não for resolvido (tabuleiro de apenas 1 cor):
+        -   Copia tabuleiro para tabuleiro auxiliar;
+        -   Verifica áreas de mesma cor que sejam adjacentes a área de flood, contando a quantidade de células
+            de cada cor para cada uma das áreas.
+        -   Utiliza tabuleiro auxiliar para veirificar qual a cor que está mais presente nas adjacências de área de flood.
+        -   Inunda o tabuleiro original com cor escolhida.
+        -   Enfileira nova jogada em lista de resultados (results).
+        -   Contabiliza nova jogada (result_size).
+
+- Como a condição do loop indica, após o seu término, teremos os passos necessários para resolução do problema (solução viável).
+
+==================================================================================================
+    v2  |
+=========
+
+Nesta versão, o problema é abordado de forma indireta, focando-se em minimizar o número de passos para alcançar 
+maiores distâncias (exploração global).
+
+- Primeiramente são extraídas as informações da entrada para estrutura variável de TGame.
+- Em função 'fromGameToGraph', informações de game são traduzidas para modelo de grafo não direcionado sem pesos onde:
+
+    *   Cada vértice representa áreas de tabuleiro de mesma cor consecutivas.
+    *   Cada aresta representa a adjacência entre áreas de tabuleiro.
+
+        Dessa forma, tendo como exemplo o tabuleiro:
+
+        2 3 2 3 2 
+        2 1 2 3 3 
+        3 1 2 3 2 
+        1 2 2 1 3 
+
+        O vértice '0' representará a área que contém as células [0,0] e [1,0] do tabuleiro,
+        contendo a cor 2 e estando conectado a outros 3 vértices. Um destes vértices  contendo
+        a cor 3 representando área de célula [0,1], outro contendo a cor 1 representando
+        área células [1,1] e [2,1] e o terceiro contendo a cor 3 representando área de célula [2,0].
+
+- Após este processo, teremos uma nova representação do problema em forma de grafo.
+- Assim é chamada a função 'solveProblem' para encontrar uma nova solução:
+
+Enquanto não encontrou solução (Todos os vértices foram absorvidos por vértice 0):
+    -   Chamar função 'defineNextNode', que efetuará busca em largura (BFS) no gráfo a partir do vértice '0',
+        verificará qual o vértice 'w' mais distante do vértice '0' e finalmente retornará a identificação do
+        vértice 'v' vizinho de '0' que leva a vértice mais distante.
+    
+    -   Chamar função 'absorbNodes', onde vértice '0' receberá a cor de 'v' , agregando todos os vizinhos de '0'
+        que compartilhem da mesma cor e removendo (sinalizando em flag 'absorbed') estes vértices do grafo (operação
+        equivalente a operação de flood em jogo).
+
+    -   Enfileira-se nova jogada em lista de resultados (result_steps) e contabiliza-se nova jogada (result_size).
+
+- Como a condição do loop indica, após o seu término, teremos os passos necessários para resolução do problema (solução viável).
+
+
+
