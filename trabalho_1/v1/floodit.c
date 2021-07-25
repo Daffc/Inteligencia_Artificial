@@ -69,7 +69,7 @@ char getMaxIndex(int *color_array, int size){
     return max;
 }
 
-
+// Function that solves de 'game'.
 void greedAreas(TGame *game){
     
     int *counter;
