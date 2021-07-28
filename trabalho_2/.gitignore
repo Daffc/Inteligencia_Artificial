@@ -1,0 +1,10 @@
+# Ignoring Objects and Executables
+*.o
+campo*
+controlador*
+exemplo1*
+exemplo2*
+
+# Accepting all .c and .h
+!*.c
+!*.h
