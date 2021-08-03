@@ -4,6 +4,7 @@ campo*
 controlador*
 exemplo1*
 exemplo2*
+jogador*
 
 # Accepting all .c and .h
 !*.c
