@@ -51,18 +51,23 @@ void imprimeJogada(Jogada *jogada){
   printf("\n");
 }
 
+
 // Recebe campo e retorna ponteiro de string para próxima jogada elaborada.
-char * elaboraJogada(char *jogadaAdv){
-  Jogada jogada;
+char * elaboraJogada(char *strJogadaAdv){
+  Jogada jogadaAdv;
+  char *jogada;
+
 
   // Recebendo jogada de adversário e armazenando em estrutura Jogada (jogada).
-  recuperaJogada(jogadaAdv, &jogada);
+  recuperaJogada(strJogadaAdv, &jogadaAdv);
 
   // Imprimindo Jogada.
-  imprimeJogada(&jogada);
+  imprimeJogada(&jogadaAdv);
 
+  // Lendo entrada padrão.
+  jogada = readline(NULL);
 
-  return jogadaAdv;
+  return jogada;
 }
 
 
@@ -78,16 +83,13 @@ int main(int argc, char **argv) {
     printf("%s", buf);
 
 
-    elaboraJogada(buf);
+    linha = elaboraJogada(buf);
 
-    // Lendo entrada padrão, caso '0', sair.
-    linha = readline(NULL);
+    // caso '0', sair.
     if(linha[0] == '0')
       break;
-    
 
     sprintf(buf, "%s\n", linha);
-    
 
     free(linha);
 
