@@ -8,11 +8,11 @@
 
 #define MAXSTR 512
 #define MAXINT 16
+#define GOL '-'
  
 // Lê string 'entrada' e popula variável 'jogada' de estrutura Jogada de acordo com o conteúdo de 'entrada'.
 void recuperaJogada(char *entrada, Jogada *jogada){
   int i;
-
 
   // separa os elementos do string recebido
   sscanf(strtok(entrada, " \n"), "%c", &(jogada->lado_meu));
@@ -52,22 +52,58 @@ void imprimeJogada(Jogada *jogada){
 }
 
 
+// Retorna valor de posição da bola tendo como origem o meio do campo (valor 0).
+int valorBola(char *campo, Jogada *jogada){
+  int i, meio_campo;
+  
+  // Armazena Posição de Meio de Campo.
+  meio_campo = (jogada->tam_campo + 2) / 2;
+
+  // Busca em vetor posição de bola.
+  for(i=0; i < (jogada->tam_campo + 2); i++){
+    // Encontrando posição de bola, retorna posição - meio_campo.
+    if (campo[i] == 'o')
+      return (i - meio_campo);
+  }
+  return 0;
+}
+
+// Retorna 1 se bola ocupa posição de gols (bordas), caso contrário retorna 0.
+int fimJogo(char *campo, Jogada *jogada){
+  if(campo[0] == 'o' || campo[jogada->tam_campo + 1] == 'o'){
+    return 1;
+  }
+  return 0;
+}
+
+
 // Recebe campo e retorna ponteiro de string para próxima jogada elaborada.
 char * elaboraJogada(char *strJogadaAdv){
   Jogada jogadaAdv;
-  char *jogada;
+  char *nova_jogada;
+  char *campo_trabalho;
 
 
   // Recebendo jogada de adversário e armazenando em estrutura Jogada (jogada).
   recuperaJogada(strJogadaAdv, &jogadaAdv);
 
   // Imprimindo Jogada.
-  imprimeJogada(&jogadaAdv);
+  // imprimeJogada(&jogadaAdv);
+
+  // Copiando campo recebido para campo_trabalho (com bordas para representar gols).
+  campo_trabalho = (char*) malloc(jogadaAdv.tam_campo + 3);
+  
+  campo_trabalho[0] = GOL;
+  memcpy(&campo_trabalho[1], jogadaAdv.campo, jogadaAdv.tam_campo);
+  campo_trabalho[jogadaAdv.tam_campo + 1] = GOL; 
+  campo_trabalho[jogadaAdv.tam_campo + 2] = '\0'; 
+
 
   // Lendo entrada padrão.
-  jogada = readline(NULL);
+  nova_jogada = readline(NULL);
 
-  return jogada;
+  free(campo_trabalho);
+  return nova_jogada;
 }
 
 

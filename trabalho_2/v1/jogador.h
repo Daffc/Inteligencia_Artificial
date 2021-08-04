@@ -9,6 +9,7 @@
     
     #define MAXSTR 512
     #define MAXINT 16
+    #define GOL '-'
 
 	// Represents a node in te node list.
 	typedef struct Jogada{
