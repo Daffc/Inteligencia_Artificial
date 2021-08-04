@@ -59,11 +59,22 @@ int valorBola(char *campo, Jogada *jogada){
   // Armazena Posição de Meio de Campo.
   meio_campo = (jogada->tam_campo + 2) / 2;
 
-  // Busca em vetor posição de bola.
-  for(i=0; i < (jogada->tam_campo + 2); i++){
-    // Encontrando posição de bola, retorna posição - meio_campo.
-    if (campo[i] == 'o')
-      return (i - meio_campo);
+  // Caso jogador esteja do lado esquerdo.
+  if(jogada->lado_meu == 'e')
+    // Busca em vetor posição de bola.
+    for(i=0; i < (jogada->tam_campo + 2); i++){
+      // Encontrando posição de bola, retorna posição - meio_campo.
+      if (campo[i] == 'o')
+        return (i - meio_campo);
+    }
+  // Caso jogador esteja do lado direito.
+  else{
+    // Busca em vetor posição de bola.
+    for(i=0; i < (jogada->tam_campo + 2); i++){
+      // Encontrando posição de bola, retorna posição - meio_campo.
+      if (campo[i] == 'o')
+        return -(i - meio_campo);
+    }
   }
   return 0;
 }
@@ -75,6 +86,8 @@ int fimJogo(char *campo, Jogada *jogada){
   }
   return 0;
 }
+
+
 
 
 // Recebe campo e retorna ponteiro de string para próxima jogada elaborada.
@@ -98,6 +111,8 @@ char * elaboraJogada(char *strJogadaAdv){
   campo_trabalho[jogadaAdv.tam_campo + 1] = GOL; 
   campo_trabalho[jogadaAdv.tam_campo + 2] = '\0'; 
 
+
+  printf("VALOR: %d\n", valorBola(campo_trabalho, &jogadaAdv));
 
   // Lendo entrada padrão.
   nova_jogada = readline(NULL);
