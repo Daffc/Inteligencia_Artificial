@@ -98,7 +98,7 @@ void insereFilosofo(char *campo, Jogada *jogada){
       campo[i] = 'f';
 
       // Trabalha com novo campo obtido (CHAMADA RECURSIVA).
-      printf("\t INSERE 'f' [%d]: %s\n", i, campo);
+      printf("\t INSERE 'f' (%c f %d): %s\n", jogada->lado_meu, i, campo);
 
       // Retorna Campo para estado anterior.
       campo[i] = '.';
@@ -106,13 +106,53 @@ void insereFilosofo(char *campo, Jogada *jogada){
   }
 }
 
+// void geraChutes(char *campo, Jogada *jogada){
+//   int i;
+
+//   // Busca em vetor posição de bola.
+//   for(i=0; i < (jogada->tam_campo + 2); i++){
+//     // Encontrando posição de bola, retorna posição - meio_campo.
+//     if (campo[i] == 'o')
+//       return (i - meio_campo);
+//   }
+//   // Percorrendo todas as posições entre os gols.
+//   for(i=1; i < (jogada->tam_campo + 1); i++){
+//     // Caso espaço esteja disponível , inserir filósofo.
+//     if (campo[i] == '.'){
+//       // Insere filósofo em posiçã livre.
+//       campo[i] = 'f';
+
+//       // Trabalha com novo campo obtido (CHAMADA RECURSIVA).
+//       printf("\t INSERE 'f' [%d]: %s\n", i, campo);
+
+//       // Retorna Campo para estado anterior.
+//       campo[i] = '.';
+//     }
+//   }
+// }
+// int minimax(int profundidade, char jogadorMax, char *campo, char ladoJogador, Jogada *jogada){
+
+//   // Se limite de profundidade alcançado
+//   if(profundidade = 0 || fimJogo(campo)){
+//     //Retornar posição/valor de bola.
+//     return valorBola(campo, jogada);
+//   }
+
+//   int valor;
+//   // Se jogador (Maximização).
+//   if(jogadorMax){
+
+//   }
+//   // Jogador adversário (Minimização).
+//   else{ 
+
+//   }
+// }
 
 // Recebe campo e retorna ponteiro de string para próxima jogada elaborada.
-char * elaboraJogada(char *strJogadaAdv){
+void elaboraJogada(char * resposta, char *strJogadaAdv){
   Jogada jogadaAdv;
-  char *nova_jogada;
   char *campo_trabalho;
-
 
   // Recebendo jogada de adversário e armazenando em estrutura Jogada (jogada).
   recuperaJogada(strJogadaAdv, &jogadaAdv);
@@ -131,19 +171,25 @@ char * elaboraJogada(char *strJogadaAdv){
   // TODO: Utilizar em função recursiva mini/max.
   insereFilosofo(campo_trabalho, &jogadaAdv);
 
+  // TODO: Utilizar em função recursiva mini/max.
+  // geraChutes(campo_trabalho, &jogadaAdv);
+
   printf("VALOR: %d\n", valorBola(campo_trabalho, &jogadaAdv));
 
   // Lendo entrada padrão.
-  nova_jogada = readline(NULL);
+  fgets(resposta, MAXSTR, stdin);
+  resposta[strlen(resposta) -1] = '\0';
 
   free(campo_trabalho);
-  return nova_jogada;
+  return;
 }
 
 
 int main(int argc, char **argv) {
   char buf[MAXSTR];
-  char *linha;
+  char *resposta;
+
+  resposta = (char *) malloc(MAXSTR);
   
   campo_conecta(argc, argv);
 
@@ -153,17 +199,18 @@ int main(int argc, char **argv) {
     printf("%s", buf);
 
 
-    linha = elaboraJogada(buf);
+    elaboraJogada(resposta, buf);
 
     // caso '0', sair.
-    if(linha[0] == '0')
+    if(resposta[0] == '0')
       break;
 
-    sprintf(buf, "%s\n", linha);
+    sprintf(buf, "%s\n", resposta);
 
-    free(linha);
 
     // Envia jogada a campo.
     campo_envia(buf);
   }
+  
+  free(resposta);
 }
