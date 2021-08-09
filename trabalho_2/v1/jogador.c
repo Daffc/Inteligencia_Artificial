@@ -90,6 +90,7 @@ int fimJogo(char *campo, Jogada *jogada){
 void insereFilosofo(char *campo, Jogada *jogada){
   int i;
 
+  printf("\tINSERE FILOSOFOS:\n");  //DEBUG
   // Percorrendo todas as posições entre os gols.
   for(i=1; i < (jogada->tam_campo + 1); i++){
     // Caso espaço esteja disponível , inserir filósofo.
@@ -97,57 +98,126 @@ void insereFilosofo(char *campo, Jogada *jogada){
       // Insere filósofo em posiçã livre.
       campo[i] = 'f';
 
-      // Trabalha com novo campo obtido (CHAMADA RECURSIVA).
-      printf("\t INSERE 'f' (%c f %d): %s\n", jogada->lado_meu, i, campo);
-
+      //#######################################
+      // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
+      printf("\t\t INSERE 'f' (%c f %d): %s\n", jogada->lado_meu, i, campo);  //DEBUG
+      //#######################################
+      
       // Retorna Campo para estado anterior.
       campo[i] = '.';
     }
   }
 }
 
-// void geraChutes(char *campo, Jogada *jogada){
-//   int i;
+void geraChutes(char *campo, Jogada *jogada){
+  int i;
+  int pos_bola, aux_pos_bola, pos_atual;
+  int saltos, saltos_pos[jogada->tam_campo];
+  char *campo_aux;
 
-//   // Busca em vetor posição de bola.
-//   for(i=0; i < (jogada->tam_campo + 2); i++){
-//     // Encontrando posição de bola, retorna posição - meio_campo.
-//     if (campo[i] == 'o')
-//       return (i - meio_campo);
-//   }
-//   // Percorrendo todas as posições entre os gols.
-//   for(i=1; i < (jogada->tam_campo + 1); i++){
-//     // Caso espaço esteja disponível , inserir filósofo.
-//     if (campo[i] == '.'){
-//       // Insere filósofo em posiçã livre.
-//       campo[i] = 'f';
+  pos_bola = 0;
+  printf("\tGERA CHUTES:\n");  //DEBUG
+  // Busca em vetor posição de bola.
+  for(i=0; i < (jogada->tam_campo + 2); i++){
+    // Encontrando posição de bola, retorna posição - meio_campo.
+    if (campo[i] == 'o'){
+      pos_bola = i;
+      break;
+    }
+  }
 
-//       // Trabalha com novo campo obtido (CHAMADA RECURSIVA).
-//       printf("\t INSERE 'f' [%d]: %s\n", i, campo);
+  // Definindo campo auxiliar, que receberá as modificações.
+  campo_aux = (char*) malloc(jogada->tam_campo + 3);
+  
+  // Copiando campo para campo auxiliar.
+  memcpy(campo_aux, campo, jogada->tam_campo + 3);
 
-//       // Retorna Campo para estado anterior.
-//       campo[i] = '.';
-//     }
-//   }
-// }
-// int minimax(int profundidade, char jogadorMax, char *campo, char ladoJogador, Jogada *jogada){
+  // Zerando contador de saltos. definindo posição atual a esquerda de bola. E armazenando posição de bola em variável auxiliar.
+  saltos = 0;
+  pos_atual = pos_bola - 1;
+  aux_pos_bola = pos_bola;
 
-//   // Se limite de profundidade alcançado
-//   if(profundidade = 0 || fimJogo(campo)){
-//     //Retornar posição/valor de bola.
-//     return valorBola(campo, jogada);
-//   }
+  printf("\t\tSALTOS A ESQUERDA:\n");  //DEBUG
 
-//   int valor;
-//   // Se jogador (Maximização).
-//   if(jogadorMax){
+  // Enquanto houver filósofo a esquerda da bola.
+  while(campo_aux[pos_atual] == 'f'){
 
-//   }
-//   // Jogador adversário (Minimização).
-//   else{ 
+    // Redefine bola como espaço vago.
+    campo_aux[aux_pos_bola] = '.';
 
-//   }
-// }
+    // Buscando próximo espaço vago ('.') ou GOL ('-') e substituindo filosofos ('f') por espaço vago.
+    while(campo_aux[pos_atual] == 'f'){
+      campo_aux[pos_atual] = '.';
+      pos_atual --;
+    }
+
+    // Armazenando destino de salto encontrado e atualizando contador de saltos.
+    saltos_pos[saltos] = pos_atual;
+    saltos ++;
+
+    // Redefinindo novo espaço encontrado como bola e armazenando nova posição de bola.
+    campo_aux[pos_atual] = 'o';
+    aux_pos_bola = pos_atual;
+
+    //#######################################
+    // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
+    printf("\t\t\tSALTO ESQUERDA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
+    for(i=0; i < saltos; i++){
+      printf("%d ", saltos_pos[i]);  //DEBUG
+    }
+    printf("): %s\n", campo_aux); //DEBUG
+    //#######################################
+
+    // Redefinindo ponteiro para esquerda de nova posição de bola(aux_pos_bola - 1).
+    pos_atual --;
+  }
+
+  // Copiando campo para campo auxiliar.
+  memcpy(campo_aux, campo, jogada->tam_campo + 3);
+
+  // Zerando contador de saltos. definindo posição atual a direita de bola. E armazenando posição de bola em variável auxiliar.
+  saltos = 0;
+  pos_atual = pos_bola + 1;
+  aux_pos_bola = pos_bola;
+
+  printf("\t\tSALTOS A DIREITA:\n");  //DEBUG
+
+  // Enquanto houver filósofo a direita da bola.
+  while(campo_aux[pos_atual] == 'f'){
+
+    // Redefine bola como espaço vago.
+    campo_aux[aux_pos_bola] = '.';
+
+    // Buscando próximo espaço vago ('.') ou GOL ('-') e substituindo filosofos ('f') por espaço vago.
+    while(campo_aux[pos_atual] == 'f'){
+      campo_aux[pos_atual] = '.';
+      pos_atual ++;
+    }
+
+    // Armazenando destino de salto encontrado e atualizando contador de saltos.
+    saltos_pos[saltos] = pos_atual;
+    saltos ++;
+
+    // Redefinindo novo espaço encontrado como bola e armazenando nova posição de bola.
+    campo_aux[pos_atual] = 'o';
+    aux_pos_bola = pos_atual;
+
+    //#######################################
+    // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
+    printf("\t\t\tSALTO DIREITA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
+    for(i=0; i < saltos; i++){
+      printf("%d ", saltos_pos[i]);  //DEBUG
+    }
+    printf("): %s\n", campo_aux); //DEBUG
+    //#######################################
+
+    // Redefinindo ponteiro para direita de nova posição de bola(aux_pos_bola + 1).
+    pos_atual ++;
+  }
+
+  free(campo_aux);
+}
+
 
 // Recebe campo e retorna ponteiro de string para próxima jogada elaborada.
 void elaboraJogada(char * resposta, char *strJogadaAdv){
@@ -172,7 +242,7 @@ void elaboraJogada(char * resposta, char *strJogadaAdv){
   insereFilosofo(campo_trabalho, &jogadaAdv);
 
   // TODO: Utilizar em função recursiva mini/max.
-  // geraChutes(campo_trabalho, &jogadaAdv);
+  geraChutes(campo_trabalho, &jogadaAdv);
 
   printf("VALOR: %d\n", valorBola(campo_trabalho, &jogadaAdv));
 
@@ -210,6 +280,8 @@ int main(int argc, char **argv) {
 
     // Envia jogada a campo.
     campo_envia(buf);
+
+    printf("#######################################-------------------\n");
   }
   
   free(resposta);
