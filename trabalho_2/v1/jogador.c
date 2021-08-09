@@ -87,7 +87,24 @@ int fimJogo(char *campo, Jogada *jogada){
   return 0;
 }
 
+void insereFilosofo(char *campo, Jogada *jogada){
+  int i;
 
+  // Percorrendo todas as posições entre os gols.
+  for(i=1; i < (jogada->tam_campo + 1); i++){
+    // Caso espaço esteja disponível , inserir filósofo.
+    if (campo[i] == '.'){
+      // Insere filósofo em posiçã livre.
+      campo[i] = 'f';
+
+      // Trabalha com novo campo obtido (CHAMADA RECURSIVA).
+      printf("\t INSERE 'f' [%d]: %s\n", i, campo);
+
+      // Retorna Campo para estado anterior.
+      campo[i] = '.';
+    }
+  }
+}
 
 
 // Recebe campo e retorna ponteiro de string para próxima jogada elaborada.
@@ -111,6 +128,8 @@ char * elaboraJogada(char *strJogadaAdv){
   campo_trabalho[jogadaAdv.tam_campo + 1] = GOL; 
   campo_trabalho[jogadaAdv.tam_campo + 2] = '\0'; 
 
+  // TODO: Utilizar em função recursiva mini/max.
+  insereFilosofo(campo_trabalho, &jogadaAdv);
 
   printf("VALOR: %d\n", valorBola(campo_trabalho, &jogadaAdv));
 
