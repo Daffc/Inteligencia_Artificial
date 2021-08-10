@@ -114,109 +114,86 @@ void geraChutes(char *campo, Jogada *jogada){
   int pos_bola, aux_pos_bola, pos_atual;
   int saltos, saltos_pos[jogada->tam_campo];
   char *campo_aux;
+  char direcao;
 
-  pos_bola = 0;
   printf("\tGERA CHUTES:\n");  //DEBUG
   // Busca em vetor posição de bola.
   for(i=0; i < (jogada->tam_campo + 2); i++){
     // Encontrando posição de bola, retorna posição - meio_campo.
-    if (campo[i] == 'o'){
-      pos_bola = i;
+    if (campo[i] == 'o')
       break;
-    }
   }
+
+  // Armazenando posição de bola.
+  pos_bola = i;
+
 
   // Definindo campo auxiliar, que receberá as modificações.
   campo_aux = (char*) malloc(jogada->tam_campo + 3);
-  
-  // Copiando campo para campo auxiliar.
-  memcpy(campo_aux, campo, jogada->tam_campo + 3);
 
-  // Zerando contador de saltos. definindo posição atual a esquerda de bola. E armazenando posição de bola em variável auxiliar.
-  saltos = 0;
-  pos_atual = pos_bola - 1;
-  aux_pos_bola = pos_bola;
+  // Definindo direção inicial de saltos ( para esquerda ).
+  direcao = -1;
 
-  printf("\t\tSALTOS A ESQUERDA:\n");  //DEBUG
+  // Loop entre direções (primeiramente saltos para esqerda, com 'direcao' = -1 e posteriormente para direita com 'direcao' = 1).
+  do{
+    // Copiando campo para campo auxiliar.
+    memcpy(campo_aux, campo, jogada->tam_campo + 3);
 
-  // Enquanto houver filósofo a esquerda da bola.
-  while(campo_aux[pos_atual] == 'f'){
+    // Zerando contador de saltos. definindo posição atual a frente de bola (de acordo com direcao). E armazenando posição de bola em variável auxiliar.
+    saltos = 0;
+    pos_atual = pos_bola + direcao;
+    aux_pos_bola = pos_bola;
 
-    // Redefine bola como espaço vago.
-    campo_aux[aux_pos_bola] = '.';
-
-    // Buscando próximo espaço vago ('.') ou GOL ('-') e substituindo filosofos ('f') por espaço vago.
+    // Enquanto houver filósofo a esquerda da bola.
     while(campo_aux[pos_atual] == 'f'){
-      campo_aux[pos_atual] = '.';
-      pos_atual --;
+
+      // Redefine bola como espaço vago.
+      campo_aux[aux_pos_bola] = '.';
+
+      // Buscando próximo espaço vago ('.') ou GOL ('-') e substituindo filosofos ('f') por espaço vago.
+      while(campo_aux[pos_atual] == 'f'){
+        campo_aux[pos_atual] = '.';
+        pos_atual += direcao;
+      }
+
+      // Armazenando destino de salto encontrado e atualizando contador de saltos.
+      saltos_pos[saltos] = pos_atual;
+      saltos ++;
+
+      // Redefinindo novo espaço encontrado como bola e armazenando nova posição de bola.
+      campo_aux[pos_atual] = 'o';
+      aux_pos_bola = pos_atual;
+
+      //#######################################
+      // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
+      if(direcao == -1){
+        printf("\t\tSALTO ESQUERDA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
+        for(i=0; i < saltos; i++){
+          printf("%d ", saltos_pos[i]);  //DEBUG
+        }
+        printf("): %s\tVALOR: %d\n", campo_aux, valorBola(campo_aux, jogada)); //DEBUG
+      }
+      else{
+        printf("\t\tSALTO DIREITA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
+        for(i=0; i < saltos; i++){
+          printf("%d ", saltos_pos[i]);  //DEBUG
+        }
+        printf("): %s\tVALOR: %d\n", campo_aux, valorBola(campo_aux, jogada)); //DEBUG
+      }
+      //#######################################
+
+      // Redefinindo posição atual a frente de bola (de acordo com direcao) para nova análise.
+      pos_atual += direcao;
     }
 
-    // Armazenando destino de salto encontrado e atualizando contador de saltos.
-    saltos_pos[saltos] = pos_atual;
-    saltos ++;
-
-    // Redefinindo novo espaço encontrado como bola e armazenando nova posição de bola.
-    campo_aux[pos_atual] = 'o';
-    aux_pos_bola = pos_atual;
-
-    //#######################################
-    // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
-    printf("\t\t\tSALTO ESQUERDA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
-    for(i=0; i < saltos; i++){
-      printf("%d ", saltos_pos[i]);  //DEBUG
-    }
-    printf("): %s\n", campo_aux); //DEBUG
-    //#######################################
-
-    // Redefinindo ponteiro para esquerda de nova posição de bola(aux_pos_bola - 1).
-    pos_atual --;
+    // invertendo direção dos saltos.
+    direcao *= -1;
   }
-
-  // Copiando campo para campo auxiliar.
-  memcpy(campo_aux, campo, jogada->tam_campo + 3);
-
-  // Zerando contador de saltos. definindo posição atual a direita de bola. E armazenando posição de bola em variável auxiliar.
-  saltos = 0;
-  pos_atual = pos_bola + 1;
-  aux_pos_bola = pos_bola;
-
-  printf("\t\tSALTOS A DIREITA:\n");  //DEBUG
-
-  // Enquanto houver filósofo a direita da bola.
-  while(campo_aux[pos_atual] == 'f'){
-
-    // Redefine bola como espaço vago.
-    campo_aux[aux_pos_bola] = '.';
-
-    // Buscando próximo espaço vago ('.') ou GOL ('-') e substituindo filosofos ('f') por espaço vago.
-    while(campo_aux[pos_atual] == 'f'){
-      campo_aux[pos_atual] = '.';
-      pos_atual ++;
-    }
-
-    // Armazenando destino de salto encontrado e atualizando contador de saltos.
-    saltos_pos[saltos] = pos_atual;
-    saltos ++;
-
-    // Redefinindo novo espaço encontrado como bola e armazenando nova posição de bola.
-    campo_aux[pos_atual] = 'o';
-    aux_pos_bola = pos_atual;
-
-    //#######################################
-    // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
-    printf("\t\t\tSALTO DIREITA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
-    for(i=0; i < saltos; i++){
-      printf("%d ", saltos_pos[i]);  //DEBUG
-    }
-    printf("): %s\n", campo_aux); //DEBUG
-    //#######################################
-
-    // Redefinindo ponteiro para direita de nova posição de bola(aux_pos_bola + 1).
-    pos_atual ++;
-  }
+  while(direcao != -1);
 
   free(campo_aux);
 }
+
 
 
 // Recebe campo e retorna ponteiro de string para próxima jogada elaborada.
@@ -281,7 +258,7 @@ int main(int argc, char **argv) {
     // Envia jogada a campo.
     campo_envia(buf);
 
-    printf("#######################################-------------------\n");
+    printf("#######################################\n");
   }
   
   free(resposta);
