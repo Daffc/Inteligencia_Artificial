@@ -13,7 +13,7 @@
 #define MAXINT 16
 #define GOL '-'
 #define PROFUNDIDADE 7
- 
+
 // Variável Global para contágem de nós. //DEBUG.
 unsigned int NOS_ARVORE; //DEBUG
 
