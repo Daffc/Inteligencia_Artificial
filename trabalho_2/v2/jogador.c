@@ -12,7 +12,7 @@
 #define MAXSTR 512
 #define MAXINT 16
 #define GOL '-'
-#define PROFUNDIDADE 1
+#define PROFUNDIDADE 7
  
 // Variável Global para contágem de nós. //DEBUG.
 unsigned int NOS_ARVORE; //DEBUG
@@ -95,7 +95,12 @@ int fimJogo(char *campo, Jogada *jogada){
   return 0;
 }
 
-int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *jogada, char *respostaFinal){
+int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *jogada, char *respostaFinal, int alpha, int beta){
+
+  // for(int j = 0; j < nivel; j++) //DEBUG
+    // printf("  "); //DEBUG
+
+  // printf("ALPHA: %d, BETA: %d\n", alpha, beta); //DEBUG
 
   NOS_ARVORE++; //DEBUG
 
@@ -116,8 +121,10 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
   //  JOGADOR  - MAXIMIZAÇÃO.
   //#######################################
   if(jogadorMax){
+    int podaAlpha;
 
     valor =  INT_MIN;
+    podaAlpha = 0;
     // ===============================
     //      GERANDO SALTOS DE BOLA
     // ===============================
@@ -146,7 +153,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       aux_pos_bola = pos_bola;
 
       // Enquanto houver filósofo a esquerda da bola.
-      while(campo_aux[pos_atual] == 'f'){
+      while(campo_aux[pos_atual] == 'f' && !podaAlpha){
 
         // Redefine bola como espaço vago.
         campo_aux[aux_pos_bola] = '.';
@@ -167,7 +174,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
 
         //#######################################
         // Chamando Filho Recursivamente e armazenando valor em 'result'.
-        result = minimax(profundidade, nivel + 1 , 0, campo_aux, jogada, respostaFinal);
+        result = minimax(profundidade, nivel + 1 , 0, campo_aux, jogada, respostaFinal, alpha, beta);
         // Caso 'result' maximize 'valor'.
         if (result >= valor){
           // Atualizando 'valor'.
@@ -182,6 +189,17 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
             snprintf(&respostaFinal[pont], MAXSTR - pont,"\n");
           }
         }
+        // Atualizando alpha.
+        if (alpha < result){
+          alpha = result;
+        }
+
+        // Verifica se possível poda
+        if(beta <= alpha){
+          podaAlpha = 1;
+        }
+
+        
         //#######################################
 
         // Redefinindo posição atual a frente de bola (de acordo com direcao) para nova análise.
@@ -191,7 +209,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       // invertendo direção dos saltos.
       direcao *= -1;
     }
-    while(direcao != -1);
+    while(direcao != -1 && !podaAlpha);
 
     // ===============================
     //      GERANDO INSERE FILÓSOFO
@@ -200,7 +218,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // Caso jogador esteja dolado direito, inserção a partir do lado esquerdo.
     if(jogada->lado_meu == 'd'){
       // Percorrendo todas as posições entre os gols da esquerda para direita.
-      for(i=1; i < (jogada->tam_campo + 1); i++){
+      for(i=1; (i < (jogada->tam_campo + 1)) && !podaAlpha; i++){
         // Caso espaço esteja disponível , inserir filósofo.
         if (campo[i] == '.'){
           // Insere filósofo em posição livre.
@@ -211,7 +229,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
           
           // printf("JG D CAMPO FIL: %s\n", campo); //DEBUG
           // Chamando Filho Recursivamente e armazenando valor em 'result'.
-          result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal);
+          result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal, alpha, beta);
           // Caso result maximize 'valor'.
           if (result > valor){
             // Atualizando 'valor'.
@@ -221,6 +239,16 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
             if(!nivel){
               snprintf(respostaFinal, MAXSTR, "%c f %d\n", jogada->lado_meu, i);
             }
+          }
+
+          // Atualizando alpha.
+          if (alpha < result){
+            alpha = result;
+          }
+          
+          // Verifica se possível poda
+          if(beta <= alpha){
+            podaAlpha = 1;
           }
 
           //#######################################
@@ -233,7 +261,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // Caso jogador esteja do lado esquerdo ('e'), inserção a partir do lado direito.
     else{
       // Percorrendo todas as posições entre os gols da direita para esquerda.
-      for(i=jogada->tam_campo; i > 0; i--){
+      for(i=jogada->tam_campo; (i > 0) && !podaAlpha; i--){
         // Caso espaço esteja disponível , inserir filósofo.
         if (campo[i] == '.'){
           // Insere filósofo em posição livre.
@@ -241,7 +269,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
 
           // printf("JG E CAMPO FIL: %s\n", campo); //DEBUG
           // Chamando Filho Recursivamente e armazenando valor em 'result'.
-          result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal);
+          result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal, alpha, beta);
           // Caso 'result' maximize 'valor'.
           if (result > valor){
             // Atualizando 'valor'.
@@ -252,6 +280,17 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
               snprintf(respostaFinal, MAXSTR, "%c f %d\n", jogada->lado_meu, i);
             }
           }
+
+          // Atualizando alpha.
+          if (alpha < result){
+            alpha = result;
+          }
+          
+          // Verifica se possível poda
+          if(beta <= alpha){
+            podaAlpha = 1;
+          }
+
           // Retorna Campo para estado anterior.
           campo[i] = '.';
         }
@@ -263,8 +302,10 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
   //  JOGADOR ADVERSÁRIO - MINIMIZAÇÃO.
   //#######################################
   else{
+    int podaBeta;
 
     valor =  INT_MAX;
+    podaBeta = 0;
     // ===============================
     //      GERANDO SALTOS DE BOLA
     // ===============================
@@ -293,7 +334,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       aux_pos_bola = pos_bola;
 
       // Enquanto houver filósofo a esquerda da bola.
-      while(campo_aux[pos_atual] == 'f'){
+      while(campo_aux[pos_atual] == 'f' && !podaBeta){
 
         // Redefine bola como espaço vago.
         campo_aux[aux_pos_bola] = '.';
@@ -315,11 +356,21 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
         //#######################################
         
         // Chamando Filho Recursivamente e armazenando valor em 'result'.
-        result = minimax(profundidade, nivel + 1 , 1, campo_aux, jogada, respostaFinal);
+        result = minimax(profundidade, nivel + 1 , 1, campo_aux, jogada, respostaFinal, alpha, beta);
         // Caso 'result' minimize 'valor'.
         if (result <= valor){
           // Atualizando 'valor'.
           valor = result;
+        }
+
+        // Atualizando beta.
+        if (beta > result){
+          beta = result;
+        }
+        
+        // Verifica se possível poda
+        if(beta <= alpha){
+          podaBeta = 1;
         }
         //#######################################
 
@@ -330,7 +381,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       // invertendo direção dos saltos.
       direcao *= -1;
     }
-    while(direcao != -1);
+    while(direcao != -1 && !podaBeta);
 
     // ===============================
     //      GERANDO INSERE FILÓSOFO
@@ -339,7 +390,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // Caso jogador adversário esteja dolado esquerdo, inimigo efetua inserção a partir do lado esquerdo.
     if(jogada->lado_adv == 'd'){
       // Percorrendo todas as posições entre os gols.
-      for(i=1; i < (jogada->tam_campo + 1); i++){
+      for(i=1; (i < (jogada->tam_campo + 1)) && !podaBeta; i++){
         // Caso espaço esteja disponível , inserir filósofo.
         if (campo[i] == '.'){
           // Insere filósofo em posição livre.
@@ -349,11 +400,21 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
           // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
           
           // Chamando Filho Recursivamente e armazenando valor em 'result'.
-          result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal);
+          result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal, alpha, beta);
           // Caso 'result' minimize 'valor'.
           if (result < valor){
             // Atualizando 'valor'.
             valor = result;
+          }
+
+          // Atualizando beta.
+          if (beta > result){
+            beta = result;
+          }
+          
+          // Verifica se possível poda
+          if(beta <= alpha){
+            podaBeta = 1;
           }
 
           //#######################################
@@ -366,7 +427,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // Caso jogador adversário esteja do lado direito, inimigo efetua inserção a partir do lado direito.
     else{
       // Percorrendo todas as posições entre os gols.
-      for(i = jogada->tam_campo; i > 0; i--){
+      for(i = jogada->tam_campo; (i > 0) && !podaBeta; i--){
         // Caso espaço esteja disponível , inserir filósofo.
         if (campo[i] == '.'){
           // Insere filósofo em posição livre.
@@ -376,11 +437,21 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
           // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
           
           // Chamando Filho Recursivamente e armazenando valor em 'result'.
-          result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal);
+          result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal, alpha, beta);
           // Caso 'result' minimize 'valor'.
           if (result < valor){
             // Atualizando 'valor'.
             valor = result;
+          }
+
+          // Atualizando beta.
+          if (beta > result){
+            beta = result;
+          }
+          
+          // Verifica se possível poda
+          if(beta <= alpha){
+            podaBeta = 1;
           }
 
           //#######################################
@@ -419,7 +490,7 @@ void elaboraJogada(char *resposta, char *strJogadaAdv){
 
   // CAMADA FUNÇÂO MINIMAX.
   NOS_ARVORE = 0;
-  int valor_final = minimax(PROFUNDIDADE, 0, 1,  campo_trabalho, &jogadaAdv, tmp_resposta); //DEBUG
+  int valor_final = minimax(PROFUNDIDADE, 0, 1,  campo_trabalho, &jogadaAdv, tmp_resposta, INT_MIN, INT_MAX); //DEBUG
   
   printf("JOGADA ESCOLHIDA: %s \nVALOR: %d \nNÓS: %d\n", tmp_resposta, valor_final, NOS_ARVORE); //DEBUG
 
