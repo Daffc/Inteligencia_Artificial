@@ -10,7 +10,7 @@
 #define MAXSTR 512
 #define MAXINT 16
 #define GOL '-'
-#define PROFUNDIDADE 7
+#define PROFUNDIDADE 10
  
 // Lê string 'entrada' e popula variável 'jogada' de estrutura Jogada de acordo com o conteúdo de 'entrada'.
 void recuperaJogada(char *entrada, Jogada *jogada){
@@ -105,7 +105,9 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
   campo_aux = (char*) malloc(jogada->tam_campo + 3);
 
 
-  // Se jogador (Maximização).
+  //#######################################
+  //  JOGADOR  - MAXIMIZAÇÃO.
+  //#######################################
   if(jogadorMax){
 
     valor =  INT_MIN;
@@ -157,22 +159,6 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
         aux_pos_bola = pos_atual;
 
         //#######################################
-        // // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
-        // if(direcao == -1){
-        //   printf("\t\tSALTO ESQUERDA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
-        //   for(i=0; i < saltos; i++){
-        //     printf("%d ", saltos_pos[i]);  //DEBUG
-        //   }
-        //   printf("): %s\n", campo_aux); //DEBUG
-        // }
-        // else{
-        //   printf("\t\tSALTO DIREITA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
-        //   for(i=0; i < saltos; i++){
-        //     printf("%d ", saltos_pos[i]);  //DEBUG
-        //   }
-        //   printf("): %s\n", campo_aux); //DEBUG
-        // }
-        
         // Chamando Filho Recursivamente e armazenando valor em 'result'.
         result = minimax(profundidade, nivel + 1 , 0, campo_aux, jogada, respostaFinal);
         // Caso 'result' maximize 'valor'.
@@ -187,10 +173,6 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
               pont += snprintf(&respostaFinal[pont], MAXSTR - pont,"%d ", saltos_pos[i]);
             }
             snprintf(&respostaFinal[pont], MAXSTR - pont,"\n");
-
-            printf("CAMPO:%s\t JOGADA: %s \n", campo_aux, respostaFinal);
-
-            // printf("\t\t\t\tESCLHA  MAX: %d,  VALOR:%d, JOGADA:%s", jogadorMax, valor, respostaFinal); //DEBUG
           }
         }
         //#######################################
@@ -207,40 +189,72 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // ===============================
     //      GERANDO INSERE FILÓSOFO
     // ===============================
-    // printf("\tINSERE FILOSOFOS:\n");  //DEBUG
-    // Percorrendo todas as posições entre os gols.
-    for(i=1; i < (jogada->tam_campo + 1); i++){
-      // Caso espaço esteja disponível , inserir filósofo.
-      if (campo[i] == '.'){
-        // Insere filósofo em posição livre.
-        campo[i] = 'f';
 
-        //#######################################
-        // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
-        // printf("\t\t INSERE 'f' (%c f %d): %s\n", jogada->lado_meu, i, campo);  //DEBUG
-        
-        // Chamando Filho Recursivamente e armazenando valor em 'result'.
-        result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal);
-        // Caso result maximize 'valor'.
-        if (result > valor){
-          // Atualizando 'valor'.
-          valor = result;
+    // Caso jogador esteja dolado direito, inserção a partir do lado esquerdo.
+    if(jogada->lado_meu == 'd'){
+      // Percorrendo todas as posições entre os gols da esquerda para direita.
+      for(i=1; i < (jogada->tam_campo + 1); i++){
+        // Caso espaço esteja disponível , inserir filósofo.
+        if (campo[i] == '.'){
+          // Insere filósofo em posição livre.
+          campo[i] = 'f';
 
-          // Caso seja nó de nível raiz (nivel = 0), escrever jogada resposta e buffer 'respostaFinal'.
-          if(!nivel){
-            snprintf(respostaFinal, MAXSTR, "%c f %d\n", jogada->lado_meu, i);
-            // printf("\t\t\t\tESCLHA  MAX: %d,  VALOR:%d, JOGADA:%s", jogadorMax, valor, respostaFinal); //DEBUG
+          //#######################################
+          // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
+          
+          // printf("JG D CAMPO FIL: %s\n", campo); //DEBUG
+          // Chamando Filho Recursivamente e armazenando valor em 'result'.
+          result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal);
+          // Caso result maximize 'valor'.
+          if (result > valor){
+            // Atualizando 'valor'.
+            valor = result;
+
+            // Caso seja nó de nível raiz (nivel = 0), escrever jogada resposta e buffer 'respostaFinal'.
+            if(!nivel){
+              snprintf(respostaFinal, MAXSTR, "%c f %d\n", jogada->lado_meu, i);
+            }
           }
-        }
 
-        //#######################################
-        
-        // Retorna Campo para estado anterior.
-        campo[i] = '.';
+          //#######################################
+          
+          // Retorna Campo para estado anterior.
+          campo[i] = '.';
+        }
       }
-    }      
+    }
+    // Caso jogador esteja do lado esquerdo ('e'), inserção a partir do lado direito.
+    else{
+      // Percorrendo todas as posições entre os gols da direita para esquerda.
+      for(i=jogada->tam_campo; i > 0; i--){
+        // Caso espaço esteja disponível , inserir filósofo.
+        if (campo[i] == '.'){
+          // Insere filósofo em posição livre.
+          campo[i] = 'f';
+
+          // printf("JG E CAMPO FIL: %s\n", campo); //DEBUG
+          // Chamando Filho Recursivamente e armazenando valor em 'result'.
+          result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal);
+          // Caso 'result' maximize 'valor'.
+          if (result > valor){
+            // Atualizando 'valor'.
+            valor = result;
+
+            // Caso seja nó de nível raiz (nivel = 0), escrever jogada resposta e buffer 'respostaFinal'.
+            if(!nivel){
+              snprintf(respostaFinal, MAXSTR, "%c f %d\n", jogada->lado_meu, i);
+            }
+          }
+          // Retorna Campo para estado anterior.
+          campo[i] = '.';
+        }
+      }
+    }
   }
-  // Jogador adversário (Minimização).
+
+  //#######################################
+  //  JOGADOR ADVERSÁRIO - MINIMIZAÇÃO.
+  //#######################################
   else{
 
     valor =  INT_MAX;
@@ -292,26 +306,11 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
         aux_pos_bola = pos_atual;
 
         //#######################################
-        // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
-        // if(direcao == -1){
-        //   printf("\t\tSALTO ESQUERDA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
-        //   for(i=0; i < saltos; i++){
-        //     printf("%d ", saltos_pos[i]);  //DEBUG
-        //   }
-        //   printf("): %s\n", campo_aux); //DEBUG
-        // }
-        // else{
-        //   printf("\t\tSALTO DIREITA (%c o %d ", jogada->lado_meu, saltos);  //DEBUG
-        //   for(i=0; i < saltos; i++){
-        //     printf("%d ", saltos_pos[i]);  //DEBUG
-        //   }
-        //   printf("): %s\n", campo_aux); //DEBUG
-        // }
         
         // Chamando Filho Recursivamente e armazenando valor em 'result'.
         result = minimax(profundidade, nivel + 1 , 1, campo_aux, jogada, respostaFinal);
         // Caso 'result' minimize 'valor'.
-        if (result < valor){
+        if (result <= valor){
           // Atualizando 'valor'.
           valor = result;
         }
@@ -329,34 +328,61 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // ===============================
     //      GERANDO INSERE FILÓSOFO
     // ===============================
-    // printf("\tINSERE FILOSOFOS:\n");  //DEBUG
-    // Percorrendo todas as posições entre os gols.
-    for(i=1; i < (jogada->tam_campo + 1); i++){
-      // Caso espaço esteja disponível , inserir filósofo.
-      if (campo[i] == '.'){
-        // Insere filósofo em posição livre.
-        campo[i] = 'f';
 
-        //#######################################
-        // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
-        // printf("\t\t INSERE 'f' (%c f %d): %s\n", jogada->lado_meu, i, campo);  //DEBUG
-        
-        // Chamando Filho Recursivamente e armazenando valor em 'result'.
-        result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal);
-        // Caso 'result' minimize 'valor'.
-        if (result < valor){
-          // Atualizando 'valor'.
-          valor = result;
+    // Caso jogador adversário esteja dolado esquerdo, inimigo efetua inserção a partir do lado esquerdo.
+    if(jogada->lado_adv == 'd'){
+      // Percorrendo todas as posições entre os gols.
+      for(i=1; i < (jogada->tam_campo + 1); i++){
+        // Caso espaço esteja disponível , inserir filósofo.
+        if (campo[i] == '.'){
+          // Insere filósofo em posição livre.
+          campo[i] = 'f';
+
+          //#######################################
+          // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
+          
+          // Chamando Filho Recursivamente e armazenando valor em 'result'.
+          result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal);
+          // Caso 'result' minimize 'valor'.
+          if (result < valor){
+            // Atualizando 'valor'.
+            valor = result;
+          }
+
+          //#######################################
+          
+          // Retorna Campo para estado anterior.
+          campo[i] = '.';
         }
+      }  
+    }
+    // Caso jogador adversário esteja do lado direito, inimigo efetua inserção a partir do lado direito.
+    else{
+      // Percorrendo todas as posições entre os gols.
+      for(i = jogada->tam_campo; i > 0; i--){
+        // Caso espaço esteja disponível , inserir filósofo.
+        if (campo[i] == '.'){
+          // Insere filósofo em posição livre.
+          campo[i] = 'f';
 
-        //#######################################
-        
-        // Retorna Campo para estado anterior.
-        campo[i] = '.';
-      }
-    }      
+          //#######################################
+          // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
+          
+          // Chamando Filho Recursivamente e armazenando valor em 'result'.
+          result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal);
+          // Caso 'result' minimize 'valor'.
+          if (result < valor){
+            // Atualizando 'valor'.
+            valor = result;
+          }
+
+          //#######################################
+          // Retorna Campo para estado anterior.
+          campo[i] = '.';
+        }
+      }  
+    }
   }
-
 
   free(campo_aux);
   return valor;
