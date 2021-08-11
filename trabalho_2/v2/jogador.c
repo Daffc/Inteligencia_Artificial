@@ -140,7 +140,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     pos_bola = i;
 
     // Definindo direção inicial de saltos ( para esquerda ).
-    direcao = -1;
+    direcao = 1;
 
     // Loop entre direções (primeiramente esquerda com direção =-1 e )
     do{
@@ -152,7 +152,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       pos_atual = pos_bola + direcao;
       aux_pos_bola = pos_bola;
 
-      // Enquanto houver filósofo a esquerda da bola.
+      // Enquanto houver filósofo ao lado 'direção' da bola.
       while(campo_aux[pos_atual] == 'f' && !podaAlpha){
 
         // Redefine bola como espaço vago.
@@ -176,6 +176,8 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
         // Chamando Filho Recursivamente e armazenando valor em 'result'.
         result = minimax(profundidade, nivel + 1 , 0, campo_aux, jogada, respostaFinal, alpha, beta);
         // Caso 'result' maximize 'valor'.
+        if(!nivel) //DEBUG
+          printf("CAMPO VERIFICADO: %s\tVALOR: %d\n", campo_aux, result);  //DEBUG
         if (result >= valor){
           // Atualizando 'valor'.
           valor = result;
@@ -187,6 +189,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
               pont += snprintf(&respostaFinal[pont], MAXSTR - pont,"%d ", saltos_pos[i]);
             }
             snprintf(&respostaFinal[pont], MAXSTR - pont,"\n");
+            printf("CAMPO ESCOLHIDO: %s\tVALOR: %d\n", respostaFinal, valor);  //DEBUG
           }
         }
         // Atualizando alpha.
@@ -209,7 +212,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       // invertendo direção dos saltos.
       direcao *= -1;
     }
-    while(direcao != -1 && !podaAlpha);
+    while(direcao != 1 && !podaAlpha);
 
     // ===============================
     //      GERANDO INSERE FILÓSOFO
