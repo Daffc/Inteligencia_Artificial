@@ -10,7 +10,7 @@
 #define MAXSTR 512
 #define MAXINT 16
 #define GOL '-'
-#define PROFUNDIDADE 10
+#define PROFUNDIDADE 7
  
 // Lê string 'entrada' e popula variável 'jogada' de estrutura Jogada de acordo com o conteúdo de 'entrada'.
 void recuperaJogada(char *entrada, Jogada *jogada){
@@ -176,7 +176,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
         // Chamando Filho Recursivamente e armazenando valor em 'result'.
         result = minimax(profundidade, nivel + 1 , 0, campo_aux, jogada, respostaFinal);
         // Caso 'result' maximize 'valor'.
-        if (result > valor){
+        if (result >= valor){
           // Atualizando 'valor'.
           valor = result;
 
