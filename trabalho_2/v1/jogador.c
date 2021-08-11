@@ -1,3 +1,5 @@
+// TODO:  Remover Linhas identificada com '//DEBUG'.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,8 +12,11 @@
 #define MAXSTR 512
 #define MAXINT 16
 #define GOL '-'
-#define PROFUNDIDADE 10
+#define PROFUNDIDADE 1
  
+// Variável Global para contágem de nós. //DEBUG.
+unsigned int NOS_ARVORE; //DEBUG
+
 // Lê string 'entrada' e popula variável 'jogada' de estrutura Jogada de acordo com o conteúdo de 'entrada'.
 void recuperaJogada(char *entrada, Jogada *jogada){
   int i;
@@ -91,6 +96,8 @@ int fimJogo(char *campo, Jogada *jogada){
 }
 
 int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *jogada, char *respostaFinal){
+
+  NOS_ARVORE++; //DEBUG
 
   // Se limite de profundidade alcançado
   if(profundidade == nivel || fimJogo(campo, jogada)){
@@ -411,11 +418,14 @@ void elaboraJogada(char *resposta, char *strJogadaAdv){
   campo_trabalho[jogadaAdv.tam_campo + 2] = '\0'; 
 
   // CAMADA FUNÇÂO MINIMAX.
-  printf("JOGADA ESCOLHIDA: %s VALOR: %d\n", tmp_resposta, minimax(PROFUNDIDADE, 0, 1,  campo_trabalho, &jogadaAdv, tmp_resposta)); //DEBUG
+  NOS_ARVORE = 0;
+  int valor_final = minimax(PROFUNDIDADE, 0, 1,  campo_trabalho, &jogadaAdv, tmp_resposta); //DEBUG
+  
+  printf("JOGADA ESCOLHIDA: %s \nVALOR: %d \nNÓS: %d\n", tmp_resposta, valor_final, NOS_ARVORE); //DEBUG
 
   // Lendo entrada padrão.
-  fgets(resposta, MAXSTR, stdin);
-  resposta[strlen(resposta) -1] = '\0';
+  fgets(resposta, MAXSTR, stdin); //DEBUG
+  resposta[strlen(resposta) -1] = '\0';  //DEBUG
     
   free(campo_trabalho);
   free(tmp_resposta); //DEBUG
@@ -449,7 +459,7 @@ int main(int argc, char **argv) {
     // Envia jogada a campo.
     campo_envia(buf);
 
-    printf("#######################################\n");
+    printf("#######################################\n"); //DEBUG
   }
   
   free(resposta);
