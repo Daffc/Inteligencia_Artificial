@@ -111,10 +111,20 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     return valorBola(campo, jogada);
   }
 
-  int i, valor, pos_bola, aux_pos_bola, pos_atual, saltos, saltos_pos[jogada->tam_campo], result, pont, direcao_inicial;
+  // VARIAVESI MINMAX
+  int i, valor, result;
+  
+  // VARIÁVEIS SALTO
+  int pos_bola, aux_pos_bola, pos_atual, saltos, saltos_pos[jogada->tam_campo], pont_escrita, direcao_inicial;
   char *campo_aux, direcao;
+  
+  // VARIÀVEIS FILOSOFOS.  
+  int pos_ini, 
+      sinal, 
+      pos_fis;
 
-  // Definindo campo auxiliar, que receberá as modificações.
+
+  // Definindo campo auxiliar, que receberá as modificações de salto.
   campo_aux = (char*) malloc(jogada->tam_campo + 3);
 
 
@@ -126,6 +136,21 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
 
     valor =  INT_MIN;
     podaAlpha = 0;
+
+
+    // Verifica o lado de jogador.
+    if(jogada->lado_meu == 'd'){
+      direcao_inicial = -1;         // Indica que saltos de bola devem iniciar para esquerda.
+      pos_ini = 1;                  // Posição incial de inserção de filósofos (campo[1]).
+      sinal = 1;                    // Direção na qual filosofos devem ser adicionados (ordem crescentes -> para direita).
+    }
+    else{
+      direcao_inicial = 1;          // Indica que saltos de bola devem iniciar para direita.
+      pos_ini = jogada->tam_campo;  // Posição incial de inserção de filósofos (campo[jogada->tam_campo]).
+      sinal = -1;                   // Direção na qual filosofos devem ser adicionados (ordem decrescente -> para esquerda).
+    }
+
+
     // ===============================
     //      GERANDO SALTOS DE BOLA
     // ===============================
@@ -138,13 +163,6 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
 
     // Armazenando posição de bola.
     pos_bola = i;
-
-    // Verifica o lado de jogador, indicando para iniciar chutes por lado oposto.
-    if(jogada->lado_meu == 'd'){
-      direcao_inicial = -1;
-    }
-    else
-      direcao_inicial = 1;
 
     // Definindo direção inicial de saltos ( para esquerda ).
     direcao = direcao_inicial;
@@ -189,11 +207,11 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
 
           // Caso seja nó de nível raiz (nivel = 0), escrever jogada resposta e buffer 'respostaFinal'.
           if(!nivel){
-            pont = snprintf(respostaFinal, MAXSTR, "%c o %d ", jogada->lado_meu, saltos);
+            pont_escrita = snprintf(respostaFinal, MAXSTR, "%c o %d ", jogada->lado_meu, saltos);
             for(i=0; i < saltos; i++){
-              pont += snprintf(&respostaFinal[pont], MAXSTR - pont,"%d ", saltos_pos[i]);
+              pont_escrita += snprintf(&respostaFinal[pont_escrita], MAXSTR - pont_escrita,"%d ", saltos_pos[i]);
             }
-            snprintf(&respostaFinal[pont], MAXSTR - pont,"\n");
+            snprintf(&respostaFinal[pont_escrita], MAXSTR - pont_escrita,"\n");
           }
         }
         // Atualizando alpha.
@@ -206,7 +224,6 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
           podaAlpha = 1;
         }
 
-        
         //#######################################
 
         // Redefinindo posição atual a frente de bola (de acordo com direcao) para nova análise.
@@ -221,88 +238,50 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // ===============================
     //      GERANDO INSERE FILÓSOFO
     // ===============================
+    // Percorrendo todas as posições entre os gols.
+    for(i=0; (i < (jogada->tam_campo)) && !podaAlpha; i++){
 
-    // Caso jogador esteja dolado direito, inserção a partir do lado esquerdo.
-    if(jogada->lado_meu == 'd'){
-      // Percorrendo todas as posições entre os gols da esquerda para direita.
-      for(i=1; (i < (jogada->tam_campo + 1)) && !podaAlpha; i++){
-        // Caso espaço esteja disponível , inserir filósofo.
-        if (campo[i] == '.'){
-          // Insere filósofo em posição livre.
-          campo[i] = 'f';
+      // Cacula posição de filósofo de acordo com lado de jogador.
+      pos_fis = pos_ini + (i * sinal);
 
-          //#######################################
-          // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
-          
-          // printf("JG D CAMPO FIL: %s\n", campo); //DEBUG
-          // Chamando Filho Recursivamente e armazenando valor em 'result'.
-          result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal, alpha, beta);
-          // Caso result maximize 'valor'.
-          if (result > valor){
-            // Atualizando 'valor'.
-            valor = result;
+      // Caso espaço esteja disponível , inserir filósofo.
+      if (campo[pos_fis] == '.'){
+        // Insere filósofo em posição livre.
+        campo[pos_fis] = 'f';
 
-            // Caso seja nó de nível raiz (nivel = 0), escrever jogada resposta e buffer 'respostaFinal'.
-            if(!nivel){
-              snprintf(respostaFinal, MAXSTR, "%c f %d\n", jogada->lado_meu, i);
-            }
+        //#######################################
+        // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
+        
+        // Chamando Filho Recursivamente e armazenando valor em 'result'.
+        result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal, alpha, beta);
+        // Caso result maximize 'valor'.
+        if (result > valor){
+          // Atualizando 'valor'.
+          valor = result;
+
+          // Caso seja nó de nível raiz (nivel = 0), escrever jogada resposta e buffer 'respostaFinal'.
+          if(!nivel){
+            snprintf(respostaFinal, MAXSTR, "%c f %d\n", jogada->lado_meu, pos_fis);
           }
-
-          // Atualizando alpha.
-          if (alpha < result){
-            alpha = result;
-          }
-          
-          // Verifica se possível poda
-          if(beta <= alpha){
-            podaAlpha = 1;
-          }
-
-          //#######################################
-          
-          // Retorna Campo para estado anterior.
-          campo[i] = '.';
         }
-      }
-    }
-    // Caso jogador esteja do lado esquerdo ('e'), inserção a partir do lado direito.
-    else{
-      // Percorrendo todas as posições entre os gols da direita para esquerda.
-      for(i=jogada->tam_campo; (i > 0) && !podaAlpha; i--){
-        // Caso espaço esteja disponível , inserir filósofo.
-        if (campo[i] == '.'){
-          // Insere filósofo em posição livre.
-          campo[i] = 'f';
+        
 
-          // printf("JG E CAMPO FIL: %s\n", campo); //DEBUG
-          // Chamando Filho Recursivamente e armazenando valor em 'result'.
-          result = minimax(profundidade, nivel + 1 , 0, campo, jogada, respostaFinal, alpha, beta);
-          // Caso 'result' maximize 'valor'.
-          if (result > valor){
-            // Atualizando 'valor'.
-            valor = result;
-
-            // Caso seja nó de nível raiz (nivel = 0), escrever jogada resposta e buffer 'respostaFinal'.
-            if(!nivel){
-              snprintf(respostaFinal, MAXSTR, "%c f %d\n", jogada->lado_meu, i);
-            }
-          }
-
-          // Atualizando alpha.
-          if (alpha < result){
-            alpha = result;
-          }
-          
-          // Verifica se possível poda
-          if(beta <= alpha){
-            podaAlpha = 1;
-          }
-
-          // Retorna Campo para estado anterior.
-          campo[i] = '.';
+        // Atualizando alpha.
+        if (alpha < result){
+          alpha = result;
         }
+        
+        // Verifica se possível poda
+        if(beta <= alpha){
+          podaAlpha = 1;
+        }
+
+        //#######################################
+        
+        // Retorna Campo para estado anterior.
+        campo[pos_fis] = '.';
       }
-    }
+    }  
   }
 
   //#######################################
@@ -313,6 +292,19 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
 
     valor =  INT_MAX;
     podaBeta = 0;
+
+    // Verifica o lado de jogador.
+    if(jogada->lado_adv == 'd'){
+      direcao_inicial = -1;         // Indica que saltos de bola devem iniciar para esquerda.
+      pos_ini = 1;                  // Posição incial de inserção de filósofos (campo[1]).
+      sinal = 1;                    // Direção na qual filosofos devem ser adicionados (ordem crescentes -> para direita).
+    }
+    else{
+      direcao_inicial = 1;          // Indica que saltos de bola devem iniciar para direita.
+      pos_ini = jogada->tam_campo;  // Posição incial de inserção de filósofos (campo[jogada->tam_campo]).
+      sinal = -1;                   // Direção na qual filosofos devem ser adicionados (ordem decrescente -> para esquerda).
+    }
+
     // ===============================
     //      GERANDO SALTOS DE BOLA
     // ===============================
@@ -402,78 +394,43 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     //      GERANDO INSERE FILÓSOFO
     // ===============================
 
-    // Caso jogador adversário esteja dolado esquerdo, inimigo efetua inserção a partir do lado esquerdo.
-    if(jogada->lado_adv == 'd'){
-      // Percorrendo todas as posições entre os gols.
-      for(i=1; (i < (jogada->tam_campo + 1)) && !podaBeta; i++){
-        // Caso espaço esteja disponível , inserir filósofo.
-        if (campo[i] == '.'){
-          // Insere filósofo em posição livre.
-          campo[i] = 'f';
+    // Percorrendo todas as posições entre os gols.
+    for(i=0; (i < (jogada->tam_campo)) && !podaBeta; i++){
 
-          //#######################################
-          // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
-          
-          // Chamando Filho Recursivamente e armazenando valor em 'result'.
-          result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal, alpha, beta);
-          // Caso 'result' minimize 'valor'.
-          if (result < valor){
-            // Atualizando 'valor'.
-            valor = result;
-          }
-
-          // Atualizando beta.
-          if (beta > result){
-            beta = result;
-          }
-          
-          // Verifica se possível poda
-          if(beta <= alpha){
-            podaBeta = 1;
-          }
-
-          //#######################################
-          
-          // Retorna Campo para estado anterior.
-          campo[i] = '.';
+      // Cacula posição de filósofo de acordo com lado de adversário.
+      pos_fis = pos_ini + (i * sinal);
+      
+      // Caso espaço esteja disponível , inserir filósofo.
+      if (campo[pos_fis] == '.'){
+        // Insere filósofo em posição livre.
+        campo[pos_fis] = 'f';
+        
+        //#######################################
+        // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
+        
+        // Chamando Filho Recursivamente e armazenando valor em 'result'.
+        result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal, alpha, beta);
+        // Caso 'result' minimize 'valor'.
+        if (result < valor){
+          // Atualizando 'valor'.
+          valor = result;
         }
-      }  
-    }
-    // Caso jogador adversário esteja do lado direito, inimigo efetua inserção a partir do lado direito.
-    else{
-      // Percorrendo todas as posições entre os gols.
-      for(i = jogada->tam_campo; (i > 0) && !podaBeta; i--){
-        // Caso espaço esteja disponível , inserir filósofo.
-        if (campo[i] == '.'){
-          // Insere filósofo em posição livre.
-          campo[i] = 'f';
 
-          //#######################################
-          // TRABALHAR COM NOVO CAMPO OBTIDO (CHAMADA RECURSIVA).
-          
-          // Chamando Filho Recursivamente e armazenando valor em 'result'.
-          result = minimax(profundidade, nivel + 1 , 1, campo, jogada, respostaFinal, alpha, beta);
-          // Caso 'result' minimize 'valor'.
-          if (result < valor){
-            // Atualizando 'valor'.
-            valor = result;
-          }
-
-          // Atualizando beta.
-          if (beta > result){
-            beta = result;
-          }
-          
-          // Verifica se possível poda
-          if(beta <= alpha){
-            podaBeta = 1;
-          }
-
-          //#######################################
-          // Retorna Campo para estado anterior.
-          campo[i] = '.';
+        // Atualizando beta.
+        if (beta > result){
+          beta = result;
         }
-      }  
+        
+        // Verifica se possível poda
+        if(beta <= alpha){
+          podaBeta = 1;
+        }
+
+        //#######################################
+        
+        // Retorna Campo para estado anterior.
+        campo[pos_fis] = '.';
+      }
     }
   }
 
