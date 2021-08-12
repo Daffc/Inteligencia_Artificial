@@ -110,7 +110,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     return valorBola(campo, jogada);
   }
 
-  int i, valor, pos_bola, aux_pos_bola, pos_atual, saltos, saltos_pos[jogada->tam_campo], result, pont;
+  int i, valor, pos_bola, aux_pos_bola, pos_atual, saltos, saltos_pos[jogada->tam_campo], result, pont, direcao_inicial;
   char *campo_aux, direcao;
 
   // Definindo campo auxiliar, que receberá as modificações.
@@ -128,7 +128,6 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // ===============================
     //      GERANDO SALTOS DE BOLA
     // ===============================
-    // printf("\tGERA CHUTES:\n");  //DEBUG
     // Busca em vetor posição de bola.
     for(i=0; i < (jogada->tam_campo + 2); i++){
       // Encontrando posição de bola, retorna posição - meio_campo.
@@ -139,8 +138,15 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // Armazenando posição de bola.
     pos_bola = i;
 
+    // Verifica o lado de jogador, indicando para iniciar chutes por lado oposto.
+    if(jogada->lado_meu == 'd'){
+      direcao_inicial = -1;
+    }
+    else
+      direcao_inicial = 1;
+
     // Definindo direção inicial de saltos ( para esquerda ).
-    direcao = 1;
+    direcao = direcao_inicial;
 
     // Loop entre direções (primeiramente esquerda com direção =-1 e )
     do{
@@ -212,7 +218,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       // invertendo direção dos saltos.
       direcao *= -1;
     }
-    while(direcao != 1 && !podaAlpha);
+    while(direcao != direcao_inicial && !podaAlpha);
 
     // ===============================
     //      GERANDO INSERE FILÓSOFO
@@ -323,8 +329,16 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // Armazenando posição de bola.
     pos_bola = i;
 
+    // Verifica o lado de jogador adversário, indicando para iniciar chutes por lado oposto.
+    if(jogada->lado_adv == 'd'){
+      direcao_inicial = -1;
+    }
+    else
+      direcao_inicial = 1;
+    
+    
     // Definindo direção inicial de saltos ( para esquerda ).
-    direcao = -1;
+    direcao = direcao_inicial;
 
     // Loop entre direções (primeiramente esquerda com direção =-1 e )
     do{
@@ -384,7 +398,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       // invertendo direção dos saltos.
       direcao *= -1;
     }
-    while(direcao != -1 && !podaBeta);
+    while(direcao != direcao_inicial && !podaBeta);
 
     // ===============================
     //      GERANDO INSERE FILÓSOFO
