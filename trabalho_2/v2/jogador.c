@@ -8,11 +8,12 @@
 #include "campo.h"
 #include "jogador.h"
 #include <limits.h>
+#include <time.h> //DEBUG
 
 #define MAXSTR 512
 #define MAXINT 16
 #define GOL '-'
-#define PROFUNDIDADE 7
+#define PROFUNDIDADE 10
 
 // Variável Global para contágem de nós. //DEBUG.
 unsigned int NOS_ARVORE; //DEBUG
@@ -182,8 +183,6 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
         // Chamando Filho Recursivamente e armazenando valor em 'result'.
         result = minimax(profundidade, nivel + 1 , 0, campo_aux, jogada, respostaFinal, alpha, beta);
         // Caso 'result' maximize 'valor'.
-        if(!nivel) //DEBUG
-          printf("CAMPO VERIFICADO: %s\tVALOR: %d\n", campo_aux, result);  //DEBUG
         if (result >= valor){
           // Atualizando 'valor'.
           valor = result;
@@ -195,7 +194,6 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
               pont += snprintf(&respostaFinal[pont], MAXSTR - pont,"%d ", saltos_pos[i]);
             }
             snprintf(&respostaFinal[pont], MAXSTR - pont,"\n");
-            printf("CAMPO ESCOLHIDO: %s\tVALOR: %d\n", respostaFinal, valor);  //DEBUG
           }
         }
         // Atualizando alpha.
@@ -489,6 +487,8 @@ void elaboraJogada(char *resposta, char *strJogadaAdv){
   char *campo_trabalho;
   char *tmp_resposta; //TODO: substituir variáveis 'tmp_resposta' por 'resposta' após testes. //DEBUG
 
+  clock_t start = clock(); //DEBUG
+
   tmp_resposta = (char *) malloc(MAXSTR); //DEBUG
 
   // Recebendo jogada de adversário e armazenando em estrutura Jogada (jogada).
@@ -505,11 +505,15 @@ void elaboraJogada(char *resposta, char *strJogadaAdv){
   campo_trabalho[jogadaAdv.tam_campo + 1] = GOL; 
   campo_trabalho[jogadaAdv.tam_campo + 2] = '\0'; 
 
+  NOS_ARVORE = 0; //DEBUG
+
   // CAMADA FUNÇÂO MINIMAX.
-  NOS_ARVORE = 0;
   int valor_final = minimax(PROFUNDIDADE, 0, 1,  campo_trabalho, &jogadaAdv, tmp_resposta, INT_MIN, INT_MAX); //DEBUG
   
   printf("JOGADA ESCOLHIDA: %s \nVALOR: %d \nNÓS: %d\n", tmp_resposta, valor_final, NOS_ARVORE); //DEBUG
+
+  clock_t end = clock(); //DEBUG
+  printf("TEMPO: %f\n", (float)(end - start) / CLOCKS_PER_SEC);
 
   // Lendo entrada padrão.
   fgets(resposta, MAXSTR, stdin); //DEBUG
