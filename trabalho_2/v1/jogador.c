@@ -169,6 +169,8 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
         // Chamando Filho Recursivamente e armazenando valor em 'result'.
         result = minimax(profundidade, nivel + 1 , 0, campo_aux, jogada, respostaFinal);
         // Caso 'result' maximize 'valor'.
+        if(!nivel)
+          printf("CAMPO VERIFICADO: %s\tVALOR: %d\n", campo_aux, result);
         if (result >= valor){
           // Atualizando 'valor'.
           valor = result;
@@ -180,6 +182,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
               pont += snprintf(&respostaFinal[pont], MAXSTR - pont,"%d ", saltos_pos[i]);
             }
             snprintf(&respostaFinal[pont], MAXSTR - pont,"\n");
+            printf("CAMPO ESCOLHIDO: %s\tVALOR: %d\n", respostaFinal, valor);
           }
         }
         //#######################################
