@@ -385,7 +385,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
         }
 
         // Caso 'result' minimize 'valor'.
-        if (result <= valor){
+       if(result < valor){
           // Atualizando 'valor'.
           valor = result;
         }
