@@ -97,7 +97,7 @@ int fimJogo(char *campo, Jogada *jogada){
 }
 
 // Retorna inteiro com quantidade de saltos.
-int criaChutes(char *campo, int *saltos_pos, unsigned char *fil_por_salto, int pos_bola, char direcao){
+int criaChutes(char *campo, int *saltos_pos, unsigned char *fil_por_salto, int pos_bola, char direcao, int tam_campo){
   int saltos;
   int pos_atual;
 
@@ -106,7 +106,7 @@ int criaChutes(char *campo, int *saltos_pos, unsigned char *fil_por_salto, int p
   pos_atual = pos_bola + direcao;
 
   // Enquanto houver filósofo ao lado 'direção' da bola.
-  while(campo[pos_atual] == 'f'){
+  while((pos_atual > -1) && (pos_atual < tam_campo) && (campo[pos_atual] == 'f')){
 
     // Redefine bola como espaço vago.
     campo[pos_bola] = '.';
@@ -216,7 +216,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       memcpy(campo_aux, campo, jogada->tam_campo + 3);
 
       // Efetuando todos os possíveis saltos em direção 'direcao'.
-      saltos = criaChutes(campo_aux, saltos_pos, fil_por_salto, pos_bola, direcao);
+      saltos = criaChutes(campo_aux, saltos_pos, fil_por_salto, pos_bola, direcao, jogada->tam_campo + 2);
 
       // Armazenando nova posição de bola.
       aux_pos_bola = posicaoBola(campo_aux, jogada);
@@ -355,7 +355,6 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
     // ===============================
     //      GERANDO SALTOS DE BOLA
     // ===============================
-    // printf("\tGERA CHUTES:\n");  //DEBUG
     // Busca em vetor posição de bola.
     for(i=0; i < (jogada->tam_campo + 2); i++){
       // Encontrando posição de bola, retorna posição - meio_campo.
@@ -375,7 +374,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       // Copiando campo para campo auxiliar.
       memcpy(campo_aux, campo, jogada->tam_campo + 3);
       
-      saltos = criaChutes(campo_aux, saltos_pos, fil_por_salto, pos_bola, direcao);
+      saltos = criaChutes(campo_aux, saltos_pos, fil_por_salto, pos_bola, direcao, jogada->tam_campo + 2);
       
       aux_pos_bola = posicaoBola(campo_aux, jogada);
       
@@ -481,8 +480,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
 }
 
 // Recebe campo e retorna ponteiro de string para próxima jogada elaborada.
-void elaboraJogada(char *resposta, char *strJogadaAdv){
-  Jogada jogadaAdv;
+void elaboraJogada(char *resposta, Jogada *jogadaAdv){
   char *campo_trabalho;
   char *tmp_resposta; //TODO: substituir variáveis 'tmp_resposta' por 'resposta' após testes. //DEBUG
 
@@ -490,24 +488,21 @@ void elaboraJogada(char *resposta, char *strJogadaAdv){
 
   tmp_resposta = (char *) malloc(MAXSTR); //DEBUG
 
-  // Recebendo jogada de adversário e armazenando em estrutura Jogada (jogada).
-  recuperaJogada(strJogadaAdv, &jogadaAdv);
-
   // Imprimindo Jogada. //DEBUG
   // imprimeJogada(&jogadaAdv); //DEBUG
 
   // Copiando campo recebido para campo_trabalho (com bordas para representar gols).
-  campo_trabalho = (char*) malloc(jogadaAdv.tam_campo + 3);
+  campo_trabalho = (char*) malloc(jogadaAdv->tam_campo + 3);
   
   campo_trabalho[0] = GOL;
-  memcpy(&campo_trabalho[1], jogadaAdv.campo, jogadaAdv.tam_campo);
-  campo_trabalho[jogadaAdv.tam_campo + 1] = GOL; 
-  campo_trabalho[jogadaAdv.tam_campo + 2] = '\0'; 
+  memcpy(&campo_trabalho[1], jogadaAdv->campo, jogadaAdv->tam_campo);
+  campo_trabalho[jogadaAdv->tam_campo + 1] = GOL; 
+  campo_trabalho[jogadaAdv->tam_campo + 2] = '\0'; 
 
   NOS_ARVORE = 0; //DEBUG
 
   // CAMADA FUNÇÂO MINIMAX.
-  int valor_final = minimax(PROFUNDIDADE, 0, 1,  campo_trabalho, &jogadaAdv, tmp_resposta, INT_MIN, INT_MAX); //DEBUG
+  int valor_final = minimax(PROFUNDIDADE, 0, 1,  campo_trabalho, jogadaAdv, tmp_resposta, INT_MIN, INT_MAX); //DEBUG
   
   printf("JOGADA ESCOLHIDA: %s \nVALOR: %d \nNÓS: %d\n", tmp_resposta, valor_final, NOS_ARVORE); //DEBUG
 
@@ -527,6 +522,8 @@ void elaboraJogada(char *resposta, char *strJogadaAdv){
 int main(int argc, char **argv) {
   char buf[MAXSTR];
   char *resposta;
+  int i;
+  Jogada jogadaAdv;
 
   resposta = (char *) malloc(MAXSTR);
   
@@ -538,7 +535,18 @@ int main(int argc, char **argv) {
     printf("%s", buf);
 
 
-    elaboraJogada(resposta, buf);
+    // Recebendo jogada de adversário e armazenando em estrutura Jogada (jogada).
+    recuperaJogada(buf, &jogadaAdv);
+
+    for(i = 0; i < jogadaAdv.tam_campo; i++){
+      if (jogadaAdv.campo[i] =='o')
+        break;
+    }
+
+    if(i == jogadaAdv.tam_campo)
+      break;
+
+    elaboraJogada(resposta, &jogadaAdv);
 
     // caso '0', sair.
     if(resposta[0] == '0')
