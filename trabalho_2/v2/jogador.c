@@ -178,8 +178,8 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       aux_pos_bola = pos_bola;
 
       // Enquanto houver filósofo ao lado 'direção' da bola.
-      while(campo_aux[pos_atual] == 'f' && !podaAlpha){
-
+      while(pos_atual > -1 && campo_aux[pos_atual] == 'f' && !podaAlpha){
+        
         // Redefine bola como espaço vago.
         campo_aux[aux_pos_bola] = '.';
 
@@ -341,7 +341,7 @@ int minimax(int profundidade, int nivel, char jogadorMax, char *campo, Jogada *j
       aux_pos_bola = pos_bola;
 
       // Enquanto houver filósofo a esquerda da bola.
-      while(campo_aux[pos_atual] == 'f' && !podaBeta){
+      while(pos_atual > -1 && campo_aux[pos_atual] == 'f'  && !podaBeta){
 
         // Redefine bola como espaço vago.
         campo_aux[aux_pos_bola] = '.';
