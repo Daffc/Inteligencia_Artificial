@@ -1,5 +1,3 @@
-// A C Program to demonstrate adjacency list
-// representation of graphs
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,7 +9,7 @@
     #define MAXINT 16
     #define GOL '-'
 
-	// Represents a node in te node list.
+	// Estrutura utilizada para armazenar informações reecebidas de servidor.
 	typedef struct Jogada{
         char campo[MAXSTR]; 
         char lado_meu;
