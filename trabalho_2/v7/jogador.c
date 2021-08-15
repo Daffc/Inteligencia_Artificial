@@ -519,6 +519,8 @@ int main(int argc, char **argv) {
     // Elaborando jogada a partid de informações recebidas (contidas em jogadaAdv).
     elaboraJogada(resposta, &jogadaAdv);
 
+    printf("%s", resposta);
+
     // Bufferizando resposta.
     sprintf(buf, "%s\n", resposta);
 
